@@ -119,7 +119,7 @@ Record `NFT_PROXY_ADDRESS`, `FORGE_PROXY_ADDRESS`, `CURVE_PROXY_ADDRESS`.
 
 1. Grant NFT `FORGE_ROLE` to forge; grant B20 `MINT_ROLE`/`BURN_ROLE` to curve and forge.
 2. `MintBerylBitsTeamAllocation` — mint `25` team tokens, revoke temporary mint role.
-3. `curve.setTeamSellLock(TEAM_ADDRESS, 1000)`.
+3. `curve.setTeamSellLock(TEAM_ADDRESS, 1000)`. Optionally `curve.setMaxBuyUnitsPerWallet(25)` for a fair-launch cap (lift later with `0`).
 4. `ConfigureBerylBitsB20Metadata` — issuer metadata (contracts, team wallet, allocation, team_sell_lock).
 
 ```bash

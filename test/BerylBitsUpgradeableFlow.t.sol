@@ -495,6 +495,35 @@ contract BerylBitsUpgradeableFlowTest is Test {
         forge.redeemAndSell(ids, 0);
         vm.stopPrank();
     }
+
+    function testMaxBuyPerWalletCapEnforcedAndConfigurable() external {
+        vm.prank(admin);
+        curve.setMaxBuyUnitsPerWallet(25);
+        assertEq(curve.maxBuyUnitsPerWallet(), 25);
+
+        // Alice can buy up to the cap across multiple txs.
+        vm.startPrank(alice);
+        curve.buy{value: 10 ether}(20, type(uint256).max);
+        curve.buy{value: 10 ether}(5, type(uint256).max);
+        assertEq(curve.curveBoughtUnits(alice), 25);
+
+        // One more unit exceeds the cap.
+        vm.expectRevert(abi.encodeWithSelector(BerylBitsB20CurveUpgradeable.WalletBuyCapExceeded.selector, uint256(26), uint256(25)));
+        curve.buy{value: 1 ether}(1, type(uint256).max);
+        vm.stopPrank();
+
+        // The cap is per-wallet: bob still has his own allowance.
+        vm.prank(bob);
+        curve.buy{value: 10 ether}(25, type(uint256).max);
+        assertEq(curve.curveBoughtUnits(bob), 25);
+
+        // Admin can lift the cap; alice can then buy again.
+        vm.prank(admin);
+        curve.setMaxBuyUnitsPerWallet(0);
+        vm.prank(alice);
+        curve.buy{value: 10 ether}(10, type(uint256).max);
+        assertEq(curve.curveBoughtUnits(alice), 25); // not tracked while disabled
+    }
 }
 
 contract ReentrantSellerUpgradeable {

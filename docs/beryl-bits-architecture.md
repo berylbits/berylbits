@@ -84,6 +84,7 @@ Responsibilities:
 - Pay buy fee to treasury.
 - Keep ETH backing for public sell obligations.
 - Enforce the team sell lock until public demand reaches the unlock threshold.
+- Enforce an optional fair-launch per-wallet buy cap (admin-configurable, `0` = unlimited).
 - Rescue only excess ETH and wrong non-B20 ERC20 tokens.
 
 Pricing:
@@ -223,6 +224,15 @@ The team allocation is `25` direct-minted, off-curve tokens with no separate ETH
 - Chosen threshold: `unlockUnits = 1000`. The team cannot pull ETH from the curve until the entire first buy band (`1,000` public units) is sold, i.e. until at least ~`0.46 ETH` of public sell backing exists in the curve.
 
 This guarantees that enough public ETH backing has accumulated in the curve before the team can pull any ETH out. It is a credible-commitment mechanism, not airtight security against a malicious admin: the deployer retains upgrade/admin rights and could route a sale through a different wallet, which would be publicly visible and defeat the point.
+
+## Fair-Launch Buy Cap
+
+The curve supports an optional per-wallet buy cap to slow one-transaction sweeps and bots at launch:
+
+- `setMaxBuyUnitsPerWallet(maxUnits)` (admin) sets the cap in units; `0` disables it (unlimited).
+- `curveBoughtUnits[wallet]` tracks cumulative curve-bought units per wallet; `_buy` reverts `WalletBuyCapExceeded` past the cap.
+- Applies only to curve buys (forge/redeem/team off-curve mint are unaffected).
+- It is a soft, sybil-imperfect speed bump (a whale can split across wallets), best paired with frontend friction if stricter fairness is needed. Typically set tight at launch (e.g. `25`) and lifted once initial demand settles.
 
 ## Public Communication Constraints
 

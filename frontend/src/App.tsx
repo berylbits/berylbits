@@ -113,12 +113,14 @@ export function App() {
       { address: contracts.nft, abi: nftAbi, functionName: 'liveSupply' },
       { address: contracts.nft, abi: nftAbi, functionName: 'totalMinted' },
       { address: contracts.curve, abi: curveAbi, functionName: 'teamSellUnlockUnits' },
+      { address: contracts.curve, abi: curveAbi, functionName: 'maxBuyUnitsPerWallet' },
       ...(address
         ? [
             { address: contracts.b20, abi: erc20Abi, functionName: 'balanceOf', args: [address] },
             { address: contracts.b20, abi: erc20Abi, functionName: 'allowance', args: [address, contracts.forge] },
             { address: contracts.b20, abi: erc20Abi, functionName: 'allowance', args: [address, contracts.curve] },
             { address: contracts.nft, abi: nftAbi, functionName: 'balanceOf', args: [address] },
+            { address: contracts.curve, abi: curveAbi, functionName: 'curveBoughtUnits', args: [address] },
           ]
         : []),
     ] as any,
@@ -146,10 +148,12 @@ export function App() {
   const liveSupply = data?.[6]?.result as bigint | undefined;
   const totalMinted = data?.[7]?.result as bigint | undefined;
   const teamSellUnlockUnits = data?.[8]?.result as bigint | undefined;
-  const b20Balance = data?.[9]?.result as bigint | undefined;
-  const forgeAllowance = data?.[10]?.result as bigint | undefined;
-  const curveAllowance = data?.[11]?.result as bigint | undefined;
-  const nftBalance = data?.[12]?.result as bigint | undefined;
+  const maxBuyPerWallet = data?.[9]?.result as bigint | undefined;
+  const b20Balance = data?.[10]?.result as bigint | undefined;
+  const forgeAllowance = data?.[11]?.result as bigint | undefined;
+  const curveAllowance = data?.[12]?.result as bigint | undefined;
+  const nftBalance = data?.[13]?.result as bigint | undefined;
+  const curveBought = data?.[14]?.result as bigint | undefined;
   const effectiveForgeAllowance: bigint | undefined =
     forgeAllowanceOverride !== null && forgeAllowanceOverride > (forgeAllowance ?? 0n) ? forgeAllowanceOverride : forgeAllowance;
   const effectiveCurveAllowance: bigint | undefined =
@@ -422,6 +426,14 @@ export function App() {
                 <p className="fee-note">
                   An immediate buy then sell returns less than you paid. You profit only if net curve demand later moves the price into a higher band.
                 </p>
+              ) : null}
+              {tradeSide === 'buy' && maxBuyPerWallet !== undefined && maxBuyPerWallet > 0n ? (
+                <Readout
+                  label="wallet buy cap"
+                  value={`${(curveBought ?? 0n).toString()} / ${maxBuyPerWallet.toString()} bought${
+                    isConnected ? ` · ${(maxBuyPerWallet - (curveBought ?? 0n)).toString()} left` : ''
+                  }`}
+                />
               ) : null}
               {crossesBand ? (
                 <div className="notice" role="status">

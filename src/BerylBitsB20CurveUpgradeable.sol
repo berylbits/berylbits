@@ -31,6 +31,12 @@ contract BerylBitsB20CurveUpgradeable is BerylBitsUpgradeableBase {
     address public teamWallet;
     uint256 public teamSellUnlockUnits;
 
+    // --- V5 storage (appended for upgrade; do not reorder) ---
+    // Fair-launch speed bump: caps curve-bought units per wallet. Admin-configurable
+    // (0 = unlimited). A soft deterrent against one-tx sweeps / whales, not sybil-proof.
+    uint256 public maxBuyUnitsPerWallet;
+    mapping(address account => uint256 units) public curveBoughtUnits;
+
     error AmountZero();
     error PublicCapExceeded();
     error InsufficientPayment(uint256 required, uint256 provided);
@@ -41,8 +47,10 @@ contract BerylBitsB20CurveUpgradeable is BerylBitsUpgradeableBase {
     error CostExceedsMaximum(uint256 cost, uint256 maxCost);
     error PayoutBelowMinimum(uint256 payout, uint256 minPayout);
     error TeamSellLocked(uint256 currentUnits, uint256 unlockUnits);
+    error WalletBuyCapExceeded(uint256 attempted, uint256 cap);
 
     event TeamSellLockUpdated(address indexed teamWallet, uint256 unlockUnits);
+    event MaxBuyUnitsPerWalletUpdated(uint256 maxUnits);
 
     modifier nonReentrant() {
         require(!_entered, "REENTRANCY");
@@ -117,6 +125,13 @@ contract BerylBitsB20CurveUpgradeable is BerylBitsUpgradeableBase {
     }
 
     function _buy(uint256 unitCount, uint256 maxCost) internal {
+        uint256 cap = maxBuyUnitsPerWallet;
+        if (cap != 0) {
+            uint256 bought = curveBoughtUnits[msg.sender] + unitCount;
+            if (bought > cap) revert WalletBuyCapExceeded(bought, cap);
+            curveBoughtUnits[msg.sender] = bought;
+        }
+
         uint256 totalCost = quoteBuy(unitCount);
         if (totalCost > maxCost) revert CostExceedsMaximum(totalCost, maxCost);
         if (msg.value < totalCost) revert InsufficientPayment(totalCost, msg.value);
@@ -163,6 +178,14 @@ contract BerylBitsB20CurveUpgradeable is BerylBitsUpgradeableBase {
         teamWallet = teamWallet_;
         teamSellUnlockUnits = unlockUnits;
         emit TeamSellLockUpdated(teamWallet_, unlockUnits);
+    }
+
+    /// @notice Set the per-wallet curve-buy cap in units. Set to 0 to disable (unlimited).
+    /// @dev A fair-launch speed bump; not sybil-proof. Typically tightened at launch and
+    /// lifted once the initial demand settles.
+    function setMaxBuyUnitsPerWallet(uint256 maxUnits) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        maxBuyUnitsPerWallet = maxUnits;
+        emit MaxBuyUnitsPerWalletUpdated(maxUnits);
     }
 
     function rescueERC20(address asset, address to, uint256 amount) external onlyRole(RESCUE_ROLE) {

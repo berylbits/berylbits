@@ -68,6 +68,17 @@
     "oldForgeMintRevoke": "0x483854c8fdc8c00e4fb713fa60d16a8be632111062637c5fb74e66c74fa22751",
     "oldForgeBurnRevoke": "0xe4968152a30b2cc8424e6d1f02af094795c39200329cff9602158e4fa9ebc3d1"
   },
+  "v6CurveBuyCap": {
+    "date": "2026-06-26",
+    "summary": "Fair-launch per-wallet buy cap added to curve (admin-configurable, 0=unlimited). Storage appended -> in-place proxy upgrade. Set to 25 for launch.",
+    "newCurveImplementation": "0x99112AE783f7f3150088b96C1f1bBcd9685a6B29",
+    "curveProxy": "0xE9515020348f02cc2979163377d31629b4C77A6B",
+    "upgradeTx": "0xef4aab0f2b16a09c05feed7e2e55823ba828e5927401aa66d8cd555537d45ef6",
+    "buyTxTrackingProof": "0x3457b400e39f5fe128c3191ebdceeaa8cb1bc997d0acdf42c004e3a4dbfd0fce",
+    "maxBuyUnitsPerWallet": 25,
+    "verifiedOnchain": "buy(26) reverts WalletBuyCapExceeded(26,25); real buy(2) -> curveBoughtUnits=2; buy(24) more reverts cumulative 26>25",
+    "note": "Sybil-soft speed bump. Admin can raise/disable via setMaxBuyUnitsPerWallet after launch rush."
+  },
   "v5NftCutShapes": {
     "date": "2026-06-26",
     "summary": "NFT art upgrade: Cut trait now drives a distinct crystal silhouette (was metadata-only). Hex (default) unchanged byte-for-byte; Prism/Needle/Royal/Step/Shard get new shapes. Storage unchanged -> in-place proxy upgrade.",
