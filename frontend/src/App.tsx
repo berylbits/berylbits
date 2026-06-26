@@ -9,6 +9,7 @@ import {
   useWriteContract,
 } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { Analytics } from '@vercel/analytics/react';
 import { explorer, contracts } from './config';
 import { curveAbi, erc20Abi, forgeAbi, nftAbi } from './abis';
 
@@ -537,6 +538,7 @@ export function App() {
         {hash ? <a href={`${explorer}/tx/${hash}`} target="_blank" rel="noreferrer">view tx</a> : null}
         {error ? <span className="error">{friendlyError(error.message)}</span> : null}
       </footer>
+      <Analytics />
     </main>
   );
 }
