@@ -1,6 +1,6 @@
 import { getDefaultConfig } from '@rainbow-me/rainbowkit';
 import { http } from 'wagmi';
-import { baseSepolia } from 'wagmi/chains';
+import { activeChain, rpcUrl } from './config';
 
 export const walletConnectProjectId =
   import.meta.env.VITE_RAINBOW_PROJECT_ID ??
@@ -10,8 +10,8 @@ export const walletConnectProjectId =
 export const wagmiConfig = getDefaultConfig({
   appName: 'Beryl Bits',
   projectId: walletConnectProjectId,
-  chains: [baseSepolia],
+  chains: [activeChain],
   transports: {
-    [baseSepolia.id]: http('https://sepolia.base.org'),
+    [activeChain.id]: http(rpcUrl),
   },
 });

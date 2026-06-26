@@ -8,9 +8,8 @@ import {
   useWaitForTransactionReceipt,
   useWriteContract,
 } from 'wagmi';
-import { baseSepolia } from 'wagmi/chains';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { baseSepoliaExplorer, contracts } from './config';
+import { explorer, contracts } from './config';
 import { curveAbi, erc20Abi, forgeAbi, nftAbi } from './abis';
 
 const unit = parseEther('1');
@@ -170,7 +169,7 @@ export function App() {
   const effectiveCurveAllowance: bigint | undefined =
     curveAllowanceOverride !== null && curveAllowanceOverride > (curveAllowance ?? 0n) ? curveAllowanceOverride : curveAllowance;
 
-  const wrongNetwork = isConnected && chainId !== baseSepolia.id;
+  const wrongNetwork = isConnected && chainId !== contracts.chainId;
   const busy = writing || confirming;
   const maxCost = quoteBuy === undefined ? 0n : withSlippageUp(quoteBuy, slippageBps);
   const minSell = quoteSell === undefined ? 0n : withSlippageDown(quoteSell, slippageBps);
@@ -535,7 +534,7 @@ export function App() {
 
       <footer className="status">
         <span aria-live="polite">{confirming ? 'waiting for confirmation' : isSuccess ? 'transaction confirmed' : wrongNetwork ? 'switch wallet to supported network' : 'ready'}</span>
-        {hash ? <a href={`${baseSepoliaExplorer}/tx/${hash}`} target="_blank" rel="noreferrer">view tx</a> : null}
+        {hash ? <a href={`${explorer}/tx/${hash}`} target="_blank" rel="noreferrer">view tx</a> : null}
         {error ? <span className="error">{friendlyError(error.message)}</span> : null}
       </footer>
     </main>
@@ -741,7 +740,7 @@ function CurveGraph(props: { outstanding?: bigint; publicCap?: bigint; quoteBuy?
 
 function AddressRow({ label, address }: { label: string; address: Address }) {
   return (
-    <a className="address-row" href={`${baseSepoliaExplorer}/address/${address}`} target="_blank" rel="noreferrer">
+    <a className="address-row" href={`${explorer}/address/${address}`} target="_blank" rel="noreferrer">
       <span>{label}</span>
       <code>{address}</code>
     </a>

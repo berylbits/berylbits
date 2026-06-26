@@ -1,7 +1,21 @@
 import type { Address } from 'viem';
+import { base, baseSepolia } from 'wagmi/chains';
+
+const chainId = Number(import.meta.env.VITE_CHAIN_ID ?? 84532);
+
+/** Active chain, selected by VITE_CHAIN_ID. Defaults to Base Sepolia. */
+export const activeChain = chainId === base.id ? base : baseSepolia;
+
+/** Optional RPC override; falls back to the chain's public default. */
+export const rpcUrl: string | undefined = import.meta.env.VITE_RPC_URL || undefined;
+
+/** Block explorer base URL for the active chain. */
+export const explorer =
+  activeChain.blockExplorers?.default.url ??
+  (chainId === base.id ? 'https://basescan.org' : 'https://sepolia.basescan.org');
 
 export const contracts = {
-  chainId: Number(import.meta.env.VITE_CHAIN_ID ?? 84532),
+  chainId,
   b20: (import.meta.env.VITE_B20_TOKEN_ADDRESS ?? '0xB20000000000000000000069d62bC417C3c5ca7E') as Address,
   curve: (import.meta.env.VITE_CURVE_ADDRESS ?? '0x5A0Ee112843DdA023b778c77cffb9904407188E0') as Address,
   forge: (import.meta.env.VITE_FORGE_ADDRESS ?? '0x272d1CBdf4f8D7091A958Af28746990a921BBd68') as Address,
@@ -10,5 +24,3 @@ export const contracts = {
   projectUri: import.meta.env.VITE_PROJECT_URI ?? 'https://berylbits.xyz',
   nftStartBlock: BigInt(import.meta.env.VITE_NFT_START_BLOCK ?? 43360310),
 };
-
-export const baseSepoliaExplorer = 'https://sepolia.basescan.org';
