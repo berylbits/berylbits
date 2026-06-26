@@ -692,6 +692,64 @@ input:focus {
   line-height: 1.4;
 }
 
+.activity-feed {
+  display: grid;
+  gap: 8px;
+}
+
+.activity-row {
+  display: grid;
+  grid-template-columns: 92px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  background: rgba(255, 253, 246, 0.64);
+  text-decoration: none;
+  color: var(--ink);
+  transition: border-color 160ms ease, transform 160ms ease;
+}
+
+.activity-row:hover {
+  border-color: var(--line-strong);
+  transform: translateY(-1px);
+}
+
+.activity-row strong {
+  font-size: 14px;
+}
+
+.activity-row code {
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.activity-tag {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 4px 8px;
+  text-align: center;
+  border: 1px solid var(--line-strong);
+}
+
+.activity-tag.forged {
+  color: var(--base-deep);
+  border-color: rgba(0, 82, 255, 0.32);
+  background: rgba(0, 82, 255, 0.1);
+}
+
+.activity-tag.redeemed {
+  color: var(--amber);
+  border-color: rgba(180, 83, 9, 0.32);
+  background: rgba(180, 83, 9, 0.1);
+}
+
+.activity-tag.transferred {
+  color: var(--ink-soft);
+}
+
 .docs-panel {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -812,7 +870,9 @@ input:focus {
   }
 
   .mode-list {
-    grid-template-columns: repeat(5, minmax(140px, 1fr));
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(128px, 1fr);
     overflow-x: auto;
     border-right: 0;
     border-bottom: 1px solid var(--line);
@@ -837,9 +897,29 @@ input:focus {
   .quote-strip,
   .protection-row,
   .curve-stats,
+  .fee-breakdown,
   .split-actions,
   .split-actions.wide {
     grid-template-columns: 1fr;
+  }
+
+  .activity-row {
+    grid-template-columns: 78px 1fr;
+    grid-template-areas: "tag id" "tag actor";
+    row-gap: 2px;
+  }
+
+  .activity-row .activity-tag {
+    grid-area: tag;
+    align-self: center;
+  }
+
+  .activity-row strong {
+    grid-area: id;
+  }
+
+  .activity-row code {
+    grid-area: actor;
   }
 }
 

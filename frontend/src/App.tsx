@@ -13,7 +13,7 @@ import { explorer, contracts } from './config';
 import { curveAbi, erc20Abi, forgeAbi, nftAbi } from './abis';
 
 const unit = parseEther('1');
-const modes = ['buy', 'forge', 'redeem', 'docs', 'system'] as const;
+const modes = ['buy', 'forge', 'redeem', 'activity', 'docs', 'system'] as const;
 type Mode = (typeof modes)[number];
 type TradeSide = 'buy' | 'sell';
 
@@ -484,6 +484,8 @@ export function App() {
             </div>
           )}
 
+          {mode === 'activity' && <ActivityFeed publicClient={publicClient} refreshKey={isSuccess} />}
+
           {mode === 'docs' && <DocsPanel />}
 
           {mode === 'system' && (
@@ -543,6 +545,7 @@ const copy = {
   buy: { short: 'eth to token', kicker: 'trade', title: 'buy or sell Beryl Bits tokens' },
   forge: { short: 'token to nft', kicker: 'forge', title: 'burn tokens and mint crystal nfts' },
   redeem: { short: 'nft to token', kicker: 'exit paths', title: 'redeem crystals or sell tokens' },
+  activity: { short: 'live feed', kicker: 'activity', title: 'recent crystal activity' },
   docs: { short: 'how it works', kicker: 'docs', title: 'how Beryl Bits works' },
   system: { short: 'contracts', kicker: 'system', title: 'current public state' },
 } satisfies Record<Mode, { short: string; kicker: string; title: string }>;
@@ -603,6 +606,82 @@ function OwnedCrystals(props: {
           </button>
         );
       })}
+    </div>
+  );
+}
+
+function ActivityFeed({ publicClient, refreshKey }: { publicClient: ReturnType<typeof usePublicClient>; refreshKey: boolean }) {
+  const [events, setEvents] = useState<Array<{ key: string; kind: 'forged' | 'redeemed' | 'transferred'; id: string; actor: string; block: bigint }>>([]);
+  const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading');
+
+  useEffect(() => {
+    if (!publicClient) return;
+    let cancelled = false;
+    const client = publicClient;
+    const transferEvent = parseAbiItem('event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)');
+
+    async function load() {
+      setState('loading');
+      try {
+        const latest = await client.getBlockNumber();
+        const floor = contracts.nftStartBlock;
+        // Many public RPCs cap eth_getLogs at ~2000 blocks; stay under it.
+        const chunk = 1900n;
+        const collected: Array<{ key: string; kind: 'forged' | 'redeemed' | 'transferred'; id: string; actor: string; block: bigint }> = [];
+        let to = latest;
+        // Walk backward in RPC-safe chunks until we have enough recent events.
+        for (let i = 0; i < 12 && to >= floor && collected.length < 25; i += 1) {
+          const from = to - chunk + 1n > floor ? to - chunk + 1n : floor;
+          try {
+            const part = await client.getLogs({ address: contracts.nft, event: transferEvent, fromBlock: from, toBlock: to });
+            for (const log of part) {
+              const fromAddr = (log.args.from ?? '').toLowerCase();
+              const toAddr = (log.args.to ?? '').toLowerCase();
+              const id = log.args.tokenId?.toString() ?? '?';
+              const kind = fromAddr === zeroAddress ? 'forged' : toAddr === zeroAddress ? 'redeemed' : 'transferred';
+              collected.push({ key: `${log.blockNumber}-${log.logIndex}`, kind, id, actor: kind === 'redeemed' ? fromAddr : toAddr, block: log.blockNumber ?? 0n });
+            }
+          } catch {
+            // skip chunks the RPC rejects
+          }
+          if (from === floor) break;
+          to = from - 1n;
+        }
+        const parsed = collected.sort((a, b) => Number(b.block - a.block)).slice(0, 25);
+        if (!cancelled) {
+          setEvents(parsed);
+          setState('ready');
+        }
+      } catch {
+        if (!cancelled) setState('error');
+      }
+    }
+
+    loadGuard(load);
+    return () => {
+      cancelled = true;
+    };
+
+    function loadGuard(fn: () => Promise<void>) {
+      fn().catch(() => {
+        if (!cancelled) setState('error');
+      });
+    }
+  }, [publicClient, refreshKey]);
+
+  if (state === 'loading') return <p className="empty-state">loading recent crystal activity...</p>;
+  if (state === 'error') return <p className="empty-state">activity feed unavailable on this rpc.</p>;
+  if (events.length === 0) return <p className="empty-state">no crystal activity yet. forge the first one.</p>;
+
+  return (
+    <div className="activity-feed">
+      {events.map((e) => (
+        <a key={e.key} className="activity-row" href={`${explorer}/token/${contracts.nft}?a=${e.id}`} target="_blank" rel="noreferrer">
+          <span className={`activity-tag ${e.kind}`}>{e.kind}</span>
+          <strong>crystal #{e.id}</strong>
+          <code>{e.actor.slice(0, 6)}…{e.actor.slice(-4)}</code>
+        </a>
+      ))}
     </div>
   );
 }
