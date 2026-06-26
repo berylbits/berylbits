@@ -32,14 +32,14 @@ contract ConfigureBerylBitsGovernance is Script {
     }
 
     function _configureForge(BerylBitsB20ForgeUpgradeable forge, address multisig, address timelock) internal {
+        // Forge exposes no rescue function, so RESCUE_ROLE is intentionally not granted here.
         forge.grantRole(forge.PAUSE_ROLE(), multisig);
-        forge.grantRole(forge.RESCUE_ROLE(), multisig);
         forge.grantRole(forge.UPGRADER_ROLE(), timelock);
     }
 
     function _configureNft(BerylBitsB20NFTUpgradeable nft, address multisig, address timelock) internal {
+        // NFT exposes no rescue function, so RESCUE_ROLE is intentionally not granted here.
         nft.grantRole(nft.PAUSE_ROLE(), multisig);
-        nft.grantRole(nft.RESCUE_ROLE(), multisig);
         nft.grantRole(nft.UPGRADER_ROLE(), timelock);
     }
 }

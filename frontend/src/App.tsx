@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react';
 import { formatEther, parseAbiItem, parseEther, zeroAddress, type Address } from 'viem';
 import {
   useAccount,
@@ -28,23 +28,6 @@ const curveBands = [
 function bandIndexForUnits(value: number) {
   const index = curveBands.findIndex((band) => value <= band.end);
   return index === -1 ? curveBands.length - 1 : index;
-}
-
-function smoothSvgPath(points: Array<{ x: number; y: number }>) {
-  if (points.length === 0) return '';
-  if (points.length === 1) return `M ${points[0].x} ${points[0].y}`;
-
-  const commands = [`M ${points[0].x} ${points[0].y}`];
-  for (let i = 1; i < points.length - 1; i += 1) {
-    const current = points[i];
-    const next = points[i + 1];
-    const midX = (current.x + next.x) / 2;
-    const midY = (current.y + next.y) / 2;
-    commands.push(`Q ${current.x} ${current.y} ${midX} ${midY}`);
-  }
-  const last = points[points.length - 1];
-  commands.push(`T ${last.x} ${last.y}`);
-  return commands.join(' ');
 }
 
 function units(value: string) {
@@ -637,103 +620,125 @@ function DocsPanel() {
 }
 
 function CurveGraph(props: { outstanding?: bigint; publicCap?: bigint; quoteBuy?: bigint; quoteSell?: bigint; tradeUnits: bigint; tradeSide: TradeSide }) {
+  const svgRef = useRef<SVGSVGElement>(null);
+  const [hoverUnits, setHoverUnits] = useState<number | null>(null);
+
   const maxUnits = Number(props.publicCap ?? 9975n);
   const current = Number(props.outstanding ?? 0n);
   const tradeDelta = Number(props.tradeUnits);
   const projected = Math.max(0, Math.min(maxUnits, props.tradeSide === 'buy' ? current + tradeDelta : current - tradeDelta));
-  const activeIndex = bandIndexForUnits(current);
-  const activeBand = curveBands[activeIndex];
+  const activeBand = curveBands[bandIndexForUnits(current)];
   const progress = Math.min(100, (current / maxUnits) * 100);
-  const projectedIndex = bandIndexForUnits(projected);
-  const frame = { left: 72, top: 34, width: 760, height: 286 };
+
+  const VB = { w: 900, h: 320 };
+  const frame = { left: 70, top: 26, width: 800, height: 232 };
   const chartBottom = frame.top + frame.height;
   const chartRight = frame.left + frame.width;
   const maxPrice = 0.0034;
-  const x = (value: number) => frame.left + (value / maxUnits) * frame.width;
-  const y = (value: number) => frame.top + frame.height - (value / maxPrice) * frame.height;
-  const curvePoints = [
-    { units: 0, buy: curveBands[0].price, sell: curveBands[0].price * 0.92 },
-    ...curveBands.map((band) => ({ units: band.end, buy: band.price, sell: band.price * 0.92 })),
-  ];
-  const buyPathPoints = curvePoints.map((point) => ({ x: x(point.units), y: y(point.buy) }));
-  const sellPathPoints = curvePoints.map((point) => ({ x: x(point.units), y: y(point.sell) }));
-  const buyPath = smoothSvgPath(buyPathPoints);
-  const sellPath = smoothSvgPath(sellPathPoints);
-  const areaPath = `${buyPath} L ${chartRight} ${chartBottom} L ${frame.left} ${chartBottom} Z`;
-  const currentX = x(current);
-  const projectedX = x(projected);
+  const x = (u: number) => frame.left + (u / maxUnits) * frame.width;
+  const y = (p: number) => frame.top + frame.height - (p / maxPrice) * frame.height;
+
+  // True step function: price is flat within a band and jumps at band edges.
+  const stepPts: Array<{ x: number; y: number }> = [];
+  curveBands.forEach((band, i) => {
+    const start = i === 0 ? 0 : curveBands[i - 1].end;
+    stepPts.push({ x: x(start), y: y(band.price) });
+    stepPts.push({ x: x(band.end), y: y(band.price) });
+  });
+  const stepLine = stepPts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
+  const stepArea = `${stepLine} L ${chartRight.toFixed(1)} ${chartBottom} L ${frame.left} ${chartBottom} Z`;
+
+  const priceAt = (u: number) => curveBands[bandIndexForUnits(u)].price;
+  const activeStart = (() => {
+    const i = bandIndexForUnits(current);
+    return i === 0 ? 0 : curveBands[i - 1].end;
+  })();
+  const activeEnd = curveBands[bandIndexForUnits(current)].end;
+
+  function onMove(e: ReactMouseEvent<SVGSVGElement>) {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const rect = svg.getBoundingClientRect();
+    const vx = ((e.clientX - rect.left) / rect.width) * VB.w;
+    const u = Math.round(Math.max(0, Math.min(maxUnits, ((vx - frame.left) / frame.width) * maxUnits)));
+    setHoverUnits(u);
+  }
+
+  const hoverPrice = hoverUnits === null ? null : priceAt(hoverUnits);
+  const hoverX = hoverUnits === null ? 0 : x(hoverUnits);
+  const tipW = 148;
+  const tipX = Math.min(Math.max(hoverX - tipW / 2, frame.left), chartRight - tipW);
 
   return (
-    <div className="curve-card expanded">
+    <div className="curve-card">
       <div className="curve-head">
         <div>
           <span>bonding curve</span>
-          <strong>smooth curve view</strong>
+          <strong>true step pricing</strong>
         </div>
-        <strong>{props.outstanding?.toString() ?? '...'} / {maxUnits.toLocaleString()} units</strong>
+        <strong>{current.toLocaleString()} / {maxUnits.toLocaleString()} units</strong>
       </div>
-      <div className="curve-studio" aria-label={`bonding curve chart. current outstanding ${current} units. projected outstanding ${projected} units.`}>
-        <div className="curve-kpis">
-          <Readout label="current demand" value={`${current.toLocaleString()} units`} />
-          <Readout label="after swap" value={`${projected.toLocaleString()} units`} />
-          <Readout label="active buy price" value={`${bandPrice(activeBand.price)} eth`} />
-          <Readout label="curve progress" value={`${progress.toFixed(1)}%`} />
-        </div>
-        <div className="curve-workspace">
-          <svg viewBox="0 0 900 360" role="img">
-            <defs>
-              <linearGradient id="curveFill" x1="0" x2="0" y1="0" y2="1">
-                <stop offset="0%" stopColor="#0052ff" stopOpacity="0.22" />
-                <stop offset="82%" stopColor="#0052ff" stopOpacity="0.02" />
-              </linearGradient>
-              <filter id="lineGlow" x="-20%" y="-20%" width="140%" height="140%">
-                <feDropShadow dx="0" dy="0" stdDeviation="3" floodColor="#0052ff" floodOpacity="0.26" />
-              </filter>
-            </defs>
-            {[0.0005, 0.00075, 0.00125, 0.002, 0.003].map((price) => (
-              <g key={price}>
-                <line className="curve-grid" x1={frame.left} x2={chartRight} y1={y(price)} y2={y(price)} />
-                <text className="curve-y-label" x="18" y={y(price) + 4}>{bandPrice(price)} eth</text>
-              </g>
-            ))}
-            {curveBands.map((band, index) => {
-              const start = index === 0 ? 0 : curveBands[index - 1].end;
-              const bandX = x(start);
-              const bandWidth = x(band.end) - bandX;
-              const active = activeIndex === index;
-              return (
-                <g key={band.end}>
-                  <rect className={active ? 'curve-band active' : 'curve-band'} x={bandX} y={frame.top} width={bandWidth} height={frame.height} />
-                  <line className="curve-band-edge" x1={x(band.end)} x2={x(band.end)} y1={frame.top} y2={chartBottom} />
-                  <text className="curve-x-label" x={bandX + 8} y="338">{index === 0 ? '0' : start + 1}-{band.end}</text>
-                </g>
-              );
-            })}
-            <path className="curve-area" d={areaPath} />
-            <path className="curve-buy-line" d={buyPath} filter="url(#lineGlow)" />
-            <path className="curve-sell-line" d={sellPath} />
-            <line className="curve-current-line" x1={currentX} x2={currentX} y1={frame.top - 10} y2={chartBottom} />
-            <line className="curve-projected-line" x1={projectedX} x2={projectedX} y1={frame.top - 10} y2={chartBottom} />
-            <circle className="curve-current-dot" cx={currentX} cy={y(activeBand.price)} r="6" />
-            <circle className="curve-projected-dot" cx={projectedX} cy={y(curveBands[projectedIndex].price)} r="6" />
-            <text className="curve-axis-title" x={frame.left} y="24">price per token</text>
-            <text className="curve-axis-title" x={chartRight - 76} y="338">units sold</text>
-          </svg>
-        </div>
-      </div>
+
+      <svg
+        ref={svgRef}
+        viewBox={`0 0 ${VB.w} ${VB.h}`}
+        role="img"
+        className="curve-svg"
+        aria-label={`bonding curve. current ${current} units at ${bandPrice(activeBand.price)} eth. hover to inspect price at any demand level.`}
+        onMouseMove={onMove}
+        onMouseLeave={() => setHoverUnits(null)}
+      >
+        <defs>
+          <linearGradient id="curveFill" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stopColor="#0052ff" stopOpacity="0.20" />
+            <stop offset="100%" stopColor="#0052ff" stopOpacity="0.01" />
+          </linearGradient>
+        </defs>
+
+        {curveBands.map((band) => (
+          <g key={`y-${band.price}`}>
+            <line className="curve-grid" x1={frame.left} x2={chartRight} y1={y(band.price)} y2={y(band.price)} />
+            <text className="curve-y-label" x={frame.left - 10} y={y(band.price) + 4} textAnchor="end">{bandPrice(band.price)}</text>
+          </g>
+        ))}
+
+        <rect className="curve-band active" x={x(activeStart)} y={frame.top} width={x(activeEnd) - x(activeStart)} height={frame.height} />
+
+        <path className="curve-step-area" d={stepArea} />
+        <path className="curve-step-line" d={stepLine} />
+
+        {tradeDelta > 0 && projected !== current ? (
+          <line className="curve-projected-line" x1={x(projected)} x2={x(projected)} y1={frame.top} y2={chartBottom} />
+        ) : null}
+
+        <line className="curve-current-line" x1={x(current)} x2={x(current)} y1={frame.top - 6} y2={chartBottom} />
+        <circle className="curve-current-dot" cx={x(current)} cy={y(activeBand.price)} r="5" />
+        <text className="curve-now-label" x={Math.min(x(current) + 8, chartRight - 30)} y={frame.top + 2}>now</text>
+
+        {hoverUnits !== null && hoverPrice !== null ? (
+          <g pointerEvents="none">
+            <line className="curve-hover-line" x1={hoverX} x2={hoverX} y1={frame.top} y2={chartBottom} />
+            <circle className="curve-hover-dot" cx={hoverX} cy={y(hoverPrice)} r="4" />
+            <g transform={`translate(${tipX.toFixed(1)}, ${frame.top + 6})`}>
+              <rect className="curve-tip-box" width={tipW} height="58" rx="8" />
+              <text className="curve-tip-title" x="12" y="21">{hoverUnits.toLocaleString()} units sold</text>
+              <text className="curve-tip-row" x="12" y="39">buy {bandPrice(hoverPrice)} eth</text>
+              <text className="curve-tip-row" x="12" y="52">sell {bandPrice(hoverPrice * 0.92)} eth</text>
+            </g>
+          </g>
+        ) : null}
+
+        <text className="curve-axis-title" x={frame.left} y={frame.top - 12}>price / token (eth)</text>
+        <text className="curve-axis-title" x={chartRight} y={chartBottom + 26} textAnchor="end">units sold →</text>
+      </svg>
+
       <div className="curve-meter"><i style={{ width: `${progress}%` }} /></div>
       <div className="curve-stats">
-        <Readout label="active buy band" value={`${bandPrice(activeBand.price)} eth`} />
+        <Readout label="active band" value={`${bandPrice(activeBand.price)} eth`} />
         <Readout label="buy quote" value={`${eth(props.quoteBuy)} eth`} />
         <Readout label="sell quote" value={`${eth(props.quoteSell)} eth`} />
-        <Readout label="projected units" value={projected.toString()} />
       </div>
-      <div className="curve-legend">
-        <span><i className="legend-current" />current demand</span>
-        <span><i className="legend-projection" />after swap</span>
-        <span><i className="legend-band" />active price zone</span>
-      </div>
-      <p>chart is smoothed for readability. contract execution still uses onchain price bands; price rises only when net demand moves into a higher band.</p>
+      <p className="curve-note">Price is a true step function — it changes only when net demand crosses a band edge. Hover the chart to inspect any level.</p>
     </div>
   );
 }

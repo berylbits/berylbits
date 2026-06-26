@@ -504,10 +504,6 @@ input:focus {
   padding: 14px;
 }
 
-.curve-card.expanded {
-  gap: 14px;
-}
-
 .curve-head {
   display: flex;
   align-items: baseline;
@@ -532,50 +528,16 @@ input:focus {
   font-size: 15px;
 }
 
-.curve-studio {
-  overflow: hidden;
-  border: 1px solid var(--line);
-  background:
-    linear-gradient(180deg, rgba(8, 18, 34, 0.98), rgba(9, 20, 38, 0.94)),
-    radial-gradient(circle at 70% 0%, rgba(0, 82, 255, 0.24), transparent 24rem);
-  color: var(--paper-strong);
-}
-
-.curve-kpis {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.035);
-}
-
-.curve-kpis .readout {
-  min-height: 72px;
-  border-top: 0;
-  padding: 14px 16px;
-}
-
-.curve-kpis .readout + .readout {
-  border-left: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.curve-kpis .readout span {
-  color: rgba(255, 253, 246, 0.62);
-}
-
-.curve-kpis .readout strong {
-  color: var(--paper-strong);
-  font-size: 18px;
-}
-
-.curve-workspace {
-  min-height: 390px;
-}
-
-.curve-workspace svg {
+.curve-svg {
   display: block;
   width: 100%;
   height: auto;
-  min-height: 390px;
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(180deg, rgba(8, 18, 34, 0.98), rgba(9, 20, 38, 0.94)),
+    radial-gradient(circle at 70% 0%, rgba(0, 82, 255, 0.22), transparent 24rem);
+  cursor: crosshair;
+  touch-action: none;
 }
 
 .curve-grid {
@@ -584,55 +546,51 @@ input:focus {
 }
 
 .curve-y-label,
-.curve-x-label,
 .curve-axis-title {
   fill: rgba(255, 253, 246, 0.56);
   font-size: 12px;
 }
 
 .curve-axis-title {
-  fill: rgba(255, 253, 246, 0.76);
+  fill: rgba(255, 253, 246, 0.74);
   font-weight: 700;
 }
 
 .curve-band {
   fill: transparent;
-  transition: fill 160ms ease;
 }
 
 .curve-band.active {
-  fill: rgba(0, 82, 255, 0.16);
+  fill: rgba(0, 82, 255, 0.14);
 }
 
-.curve-band-edge {
-  stroke: rgba(255, 255, 255, 0.08);
-}
-
-.curve-area {
+.curve-step-area {
   fill: url("#curveFill");
 }
 
-.curve-buy-line,
-.curve-sell-line {
+.curve-step-line {
   fill: none;
-  stroke-linejoin: miter;
-  stroke-linecap: round;
-}
-
-.curve-buy-line {
   stroke: #7ab7ff;
-  stroke-width: 4;
-}
-
-.curve-sell-line {
-  stroke: #f6a94a;
-  stroke-width: 2.5;
-  stroke-dasharray: 9 8;
+  stroke-width: 3;
+  stroke-linejoin: round;
+  stroke-linecap: round;
 }
 
 .curve-current-line {
   stroke: #72d5ff;
   stroke-width: 2;
+}
+
+.curve-current-dot {
+  fill: #72d5ff;
+  stroke: #081222;
+  stroke-width: 3;
+}
+
+.curve-now-label {
+  fill: #72d5ff;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .curve-projected-line {
@@ -641,18 +599,33 @@ input:focus {
   stroke-dasharray: 7 7;
 }
 
-.curve-current-dot,
-.curve-projected-dot {
+.curve-hover-line {
+  stroke: rgba(255, 253, 246, 0.5);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+}
+
+.curve-hover-dot {
+  fill: #ffffff;
   stroke: #081222;
-  stroke-width: 3;
+  stroke-width: 2;
 }
 
-.curve-current-dot {
-  fill: #72d5ff;
+.curve-tip-box {
+  fill: rgba(6, 14, 28, 0.95);
+  stroke: rgba(122, 183, 255, 0.5);
+  stroke-width: 1;
 }
 
-.curve-projected-dot {
-  fill: #f6a94a;
+.curve-tip-title {
+  fill: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.curve-tip-row {
+  fill: rgba(255, 253, 246, 0.82);
+  font-size: 12px;
 }
 
 .curve-meter {
@@ -665,11 +638,12 @@ input:focus {
   display: block;
   height: 100%;
   background: var(--base);
+  transition: width 200ms ease;
 }
 
 .curve-stats {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 6px;
 }
 
@@ -681,39 +655,11 @@ input:focus {
   font-size: 16px;
 }
 
-.curve-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
+.curve-note {
+  margin: 0;
   color: var(--ink-soft);
-  font-size: 13px;
-}
-
-.curve-legend span {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.curve-legend i {
-  display: inline-block;
-  width: 18px;
-  height: 3px;
-  background: var(--ink);
-}
-
-.curve-legend .legend-current {
-  background: var(--base);
-}
-
-.curve-legend .legend-projection {
-  background: repeating-linear-gradient(90deg, var(--amber) 0 5px, transparent 5px 9px);
-}
-
-.curve-legend .legend-band {
-  height: 10px;
-  background: rgba(0, 82, 255, 0.18);
-  border: 1px solid rgba(0, 82, 255, 0.28);
+  font-size: 12.5px;
+  line-height: 1.4;
 }
 
 .docs-panel {
@@ -860,7 +806,6 @@ input:focus {
   .docs-panel,
   .quote-strip,
   .protection-row,
-  .curve-kpis,
   .curve-stats,
   .split-actions,
   .split-actions.wide {
