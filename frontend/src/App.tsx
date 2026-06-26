@@ -629,6 +629,8 @@ function CurveGraph(props: { outstanding?: bigint; publicCap?: bigint; quoteBuy?
   const projected = Math.max(0, Math.min(maxUnits, props.tradeSide === 'buy' ? current + tradeDelta : current - tradeDelta));
   const activeBand = curveBands[bandIndexForUnits(current)];
   const progress = Math.min(100, (current / maxUnits) * 100);
+  const projectedProgress = Math.min(100, (projected / maxUnits) * 100);
+  const hasSwap = tradeDelta > 0 && projected !== current;
 
   const VB = { w: 900, h: 320 };
   const frame = { left: 70, top: 26, width: 800, height: 232 };
@@ -707,8 +709,19 @@ function CurveGraph(props: { outstanding?: bigint; publicCap?: bigint; quoteBuy?
         <path className="curve-step-area" d={stepArea} />
         <path className="curve-step-line" d={stepLine} />
 
-        {tradeDelta > 0 && projected !== current ? (
-          <line className="curve-projected-line" x1={x(projected)} x2={x(projected)} y1={frame.top} y2={chartBottom} />
+        {hasSwap ? (
+          <>
+            <line className="curve-projected-line" x1={x(projected)} x2={x(projected)} y1={frame.top} y2={chartBottom} />
+            <circle className="curve-projected-dot" cx={x(projected)} cy={y(priceAt(projected))} r="5" />
+            <text
+              className="curve-projected-label"
+              x={Math.min(Math.max(x(projected), frame.left + 28), chartRight - 28)}
+              y={y(priceAt(projected)) - 12}
+              textAnchor="middle"
+            >
+              {props.tradeSide === 'buy' ? 'buy' : 'sell'} → {bandPrice(priceAt(projected))} eth
+            </text>
+          </>
         ) : null}
 
         <line className="curve-current-line" x1={x(current)} x2={x(current)} y1={frame.top - 6} y2={chartBottom} />
@@ -732,9 +745,17 @@ function CurveGraph(props: { outstanding?: bigint; publicCap?: bigint; quoteBuy?
         <text className="curve-axis-title" x={chartRight} y={chartBottom + 26} textAnchor="end">units sold →</text>
       </svg>
 
-      <div className="curve-meter"><i style={{ width: `${progress}%` }} /></div>
+      <div className="curve-meter" role="progressbar" aria-valuenow={Math.round(projectedProgress)} aria-valuemin={0} aria-valuemax={100}>
+        <i className="meter-current" style={{ width: `${Math.min(progress, projectedProgress)}%` }} />
+        {hasSwap ? (
+          <i
+            className={`meter-projected ${props.tradeSide}`}
+            style={{ left: `${Math.min(progress, projectedProgress)}%`, width: `${Math.abs(projectedProgress - progress)}%` }}
+          />
+        ) : null}
+      </div>
       <div className="curve-stats">
-        <Readout label="active band" value={`${bandPrice(activeBand.price)} eth`} />
+        <Readout label={hasSwap ? 'after swap' : 'progress'} value={`${(hasSwap ? projectedProgress : progress).toFixed(1)}%`} />
         <Readout label="buy quote" value={`${eth(props.quoteBuy)} eth`} />
         <Readout label="sell quote" value={`${eth(props.quoteSell)} eth`} />
       </div>

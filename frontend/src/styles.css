@@ -599,6 +599,18 @@ input:focus {
   stroke-dasharray: 7 7;
 }
 
+.curve-projected-dot {
+  fill: #f6a94a;
+  stroke: #081222;
+  stroke-width: 3;
+}
+
+.curve-projected-label {
+  fill: #f6a94a;
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .curve-hover-line {
   stroke: rgba(255, 253, 246, 0.5);
   stroke-width: 1;
@@ -629,16 +641,34 @@ input:focus {
 }
 
 .curve-meter {
+  position: relative;
   height: 8px;
   background: rgba(7, 17, 31, 0.12);
   overflow: hidden;
 }
 
 .curve-meter i {
-  display: block;
+  position: absolute;
+  top: 0;
   height: 100%;
+}
+
+.curve-meter .meter-current {
+  left: 0;
   background: var(--base);
   transition: width 200ms ease;
+}
+
+.curve-meter .meter-projected {
+  transition: left 200ms ease, width 200ms ease;
+}
+
+.curve-meter .meter-projected.buy {
+  background: repeating-linear-gradient(90deg, var(--amber) 0 6px, transparent 6px 10px);
+}
+
+.curve-meter .meter-projected.sell {
+  background: repeating-linear-gradient(90deg, var(--danger) 0 6px, transparent 6px 10px);
 }
 
 .curve-stats {
