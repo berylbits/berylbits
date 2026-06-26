@@ -39,11 +39,16 @@ Buy bands:
 
 | Public units sold | Buy price per token |
 | --- | ---: |
-| `0-1,000` | `0.0005 ETH` |
-| `1,001-2,500` | `0.00075 ETH` |
-| `2,501-4,500` | `0.00125 ETH` |
-| `4,501-7,000` | `0.002 ETH` |
-| `7,001-9,975` | `0.003 ETH` |
+| `0-1,250` | `0.0005 ETH` |
+| `1,251-2,500` | `0.00065 ETH` |
+| `2,501-3,750` | `0.00085 ETH` |
+| `3,751-5,000` | `0.0011 ETH` |
+| `5,001-6,250` | `0.0014 ETH` |
+| `6,251-7,500` | `0.0018 ETH` |
+| `7,501-8,750` | `0.0023 ETH` |
+| `8,751-9,975` | `0.003 ETH` |
+
+The curve uses eight bands with roughly even `~28-31%` steps so price appreciates smoothly across the whole range, with no large flat tail at the top.
 
 Sell payout is `92%` of the matching active sell band. Example: if the current sell band price is `0.003 ETH`, the user receives `0.00276 ETH` per token before gas.
 

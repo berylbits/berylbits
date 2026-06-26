@@ -18,10 +18,13 @@ type Mode = (typeof modes)[number];
 type TradeSide = 'buy' | 'sell';
 
 const curveBands = [
-  { end: 1000, price: 0.0005 },
-  { end: 2500, price: 0.00075 },
-  { end: 4500, price: 0.00125 },
-  { end: 7000, price: 0.002 },
+  { end: 1250, price: 0.0005 },
+  { end: 2500, price: 0.00065 },
+  { end: 3750, price: 0.00085 },
+  { end: 5000, price: 0.0011 },
+  { end: 6250, price: 0.0014 },
+  { end: 7500, price: 0.0018 },
+  { end: 8750, price: 0.0023 },
   { end: 9975, price: 0.003 },
 ];
 

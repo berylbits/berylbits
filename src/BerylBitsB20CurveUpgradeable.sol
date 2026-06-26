@@ -15,8 +15,8 @@ contract BerylBitsB20CurveUpgradeable is BerylBitsUpgradeableBase {
     uint256 public constant BPS_DENOMINATOR = 10_000;
     uint256 public constant PUBLIC_UNITS = 9_975;
 
-    uint256[5] internal _bandCeilings;
-    uint256[5] internal _bandPrices;
+    uint256[8] internal _bandCeilings;
+    uint256[8] internal _bandPrices;
 
     IBerylBitsB20Like public token;
     address public treasury;
@@ -60,8 +60,17 @@ contract BerylBitsB20CurveUpgradeable is BerylBitsUpgradeableBase {
         __BerylBitsUpgradeableBase_init(admin);
         token = IBerylBitsB20Like(token_);
         treasury = treasury_;
-        _bandCeilings = [uint256(1_000), 2_500, 4_500, 7_000, 9_975];
-        _bandPrices = [uint256(0.0005 ether), 0.00075 ether, 0.00125 ether, 0.002 ether, 0.003 ether];
+        _bandCeilings = [uint256(1_250), 2_500, 3_750, 5_000, 6_250, 7_500, 8_750, 9_975];
+        _bandPrices = [
+            uint256(0.0005 ether),
+            0.00065 ether,
+            0.00085 ether,
+            0.0011 ether,
+            0.0014 ether,
+            0.0018 ether,
+            0.0023 ether,
+            0.003 ether
+        ];
     }
 
     function quoteBuy(uint256 unitCount) public view returns (uint256) {
@@ -161,11 +170,11 @@ contract BerylBitsB20CurveUpgradeable is BerylBitsUpgradeableBase {
         IERC20(asset).safeTransfer(to, amount);
     }
 
-    function bandCeilings() external view returns (uint256[5] memory) {
+    function bandCeilings() external view returns (uint256[8] memory) {
         return _bandCeilings;
     }
 
-    function bandPrices() external view returns (uint256[5] memory) {
+    function bandPrices() external view returns (uint256[8] memory) {
         return _bandPrices;
     }
 

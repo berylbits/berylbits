@@ -41,11 +41,14 @@ NFTs have **no guaranteed ETH floor**. Their only curve exit path is `NFT → to
 
 | Public units sold | Buy price / token |
 |---|---:|
-| `0 – 1,000` | `0.0005 ETH` |
-| `1,001 – 2,500` | `0.00075 ETH` |
-| `2,501 – 4,500` | `0.00125 ETH` |
-| `4,501 – 7,000` | `0.002 ETH` |
-| `7,001 – 9,975` | `0.003 ETH` |
+| `0 – 1,250` | `0.0005 ETH` |
+| `1,251 – 2,500` | `0.00065 ETH` |
+| `2,501 – 3,750` | `0.00085 ETH` |
+| `3,751 – 5,000` | `0.0011 ETH` |
+| `5,001 – 6,250` | `0.0014 ETH` |
+| `6,251 – 7,500` | `0.0018 ETH` |
+| `7,501 – 8,750` | `0.0023 ETH` |
+| `8,751 – 9,975` | `0.003 ETH` |
 
 Price moves with **net curve demand**, not with time. Forge and redeem do not move the curve (the public unit stays outstanding, only its form changes).
 

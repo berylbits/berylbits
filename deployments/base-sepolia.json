@@ -23,8 +23,9 @@
     "nftProxy": "0x3848C9d288bef5083Ea6ca6C5262C7763559d427",
     "forgeImplementation": "0x26CBe98F63680221f99bB59f0994ec38D7e98CD8",
     "forgeProxy": "0x272d1CBdf4f8D7091A958Af28746990a921BBd68",
-    "curveImplementation": "0x6fB9A2f036c4375bAFd49a1599e5741824b865e0",
-    "curveProxy": "0x5A0Ee112843DdA023b778c77cffb9904407188E0"
+    "curveImplementation": "0x808E61beD4524e507998f4297400bA56b19fC050",
+    "curveProxy": "0xE9515020348f02cc2979163377d31629b4C77A6B",
+    "curveProxyLegacy5Band": "0x5A0Ee112843DdA023b778c77cffb9904407188E0"
   },
   "deployTxs": {
     "nftImplementation": "0xeab040335c29d76aed686524373998f8143b06ca0d8a2b0b116a41014dfec18b",
@@ -66,6 +67,18 @@
     "oldCurveBurnRevoke": "0xd9bdfd208c17be5bf3f96ef75ac2935e6cbdeec514df2d2f425d8c2d72678a27",
     "oldForgeMintRevoke": "0x483854c8fdc8c00e4fb713fa60d16a8be632111062637c5fb74e66c74fa22751",
     "oldForgeBurnRevoke": "0xe4968152a30b2cc8424e6d1f02af094795c39200329cff9602158e4fa9ebc3d1"
+  },
+  "v4Curve8BandRedeploy": {
+    "date": "2026-06-26",
+    "summary": "Fresh 8-band curve proxy (storage array [5]->[8] required a new proxy). Forge re-pointed, B20 mint/burn moved to new curve, team sell lock set to 1000.",
+    "newCurveImplementation": "0x808E61beD4524e507998f4297400bA56b19fC050",
+    "newCurveProxy": "0xE9515020348f02cc2979163377d31629b4C77A6B",
+    "legacyCurveProxy": "0x5A0Ee112843DdA023b778c77cffb9904407188E0",
+    "bandCeilings": [1250, 2500, 3750, 5000, 6250, 7500, 8750, 9975],
+    "bandPricesEth": [0.0005, 0.00065, 0.00085, 0.0011, 0.0014, 0.0018, 0.0023, 0.003],
+    "teamSellUnlockUnits": 1000,
+    "verifiedOnchain": "quoteBuy(1)=0.0005, quoteBuy(1250)=0.625, quoteBuy(1251)=0.62565 (band-2 0.00065 at edge 1250); buy->forge->redeem E2E ok; team sell blocked TeamSellLocked(1,1000)",
+    "burnRoleGrantNewCurve": "0xc3112ef003f4ae9943469d2b73b80a86ea7c8974e4e1caf69bd8a64ad1b5cf55"
   },
   "v3UpgradeTxs": {
     "date": "2026-06-26",

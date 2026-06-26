@@ -88,7 +88,7 @@ Responsibilities:
 
 Pricing:
 
-- Buy bands: `0.0005 / 0.00075 / 0.00125 / 0.002 / 0.003 ETH`.
+- Buy bands (8, ceilings `1,250 / 2,500 / 3,750 / 5,000 / 6,250 / 7,500 / 8,750 / 9,975`): `0.0005 / 0.00065 / 0.00085 / 0.0011 / 0.0014 / 0.0018 / 0.0023 / 0.003 ETH`.
 - Buy fee: `800 bps`, transferred to treasury.
 - Sell payout: `9200 bps` of active band price.
 - Public curve capacity: `9,975` units.
