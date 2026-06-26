@@ -608,7 +608,11 @@ function DocsPanel() {
       </section>
       <section>
         <h3>crystal generation</h3>
-        <p>Each NFT is generated fully onchain as SVG. The art is a centered pixel beryl crystal with deterministic traits for color, cut, facets, inclusions, clarity, and background.</p>
+        <p>Each crystal is generated fully onchain as SVG from a seed fixed at forge time. Traits are formation properties: Cut shapes the silhouette, Beryl Color and Clarity set the palette, Facet Pattern and Inclusion paint the interior, Background sets the field, and a rare Mythic touch adds gold edges. Every trait is read straight from the contract.</p>
+      </section>
+      <section>
+        <h3>impermanence</h3>
+        <p>A crystal exists only while held as an NFT. Redeeming it shatters the crystal back into a token forever; forging again grows a brand-new one with new traits and a new id. Rare crystals survive only because their holders choose not to redeem them — scarcity here is a deliberate act of holding.</p>
       </section>
       <section>
         <h3>fees and risk</h3>

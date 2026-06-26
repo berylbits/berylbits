@@ -15,9 +15,13 @@ The project takes inspiration from Unipeg's idea that trading activity can becom
 
 ## Lore
 
-Beryl Bits are crystallized fragments of Base's Beryl era. Each NFT is a compact onchain beryl stone: faceted, centered, pixel-rendered, and generated fully by contract code.
+Beryl Bits are crystallized fragments of Base's Beryl era — the B20 epoch. A fragment crystallizes the moment a token is committed (forged); the on-chain conditions at that block decide how it forms. Each NFT is a compact onchain beryl stone: faceted, centered, pixel-rendered, and generated fully by contract code.
 
 The collection should feel like Base-native mineral artifacts, not PFP characters. There are no eyes, faces, antennae, mascot limbs, text, or character props inside the image.
+
+### Impermanence
+
+A crystal exists only while it is held as an NFT. Redeeming it shatters the crystal back into a fungible token forever — its specific form, traits, and token ID are lost. Forging again grows an entirely new crystal with new properties (a new seed and ID). This means rare crystals survive only because their holders choose not to redeem them: every rare stone in circulation is a deliberate act of holding. The result is emergent scarcity — the rarer and more admired a crystal, the more its owner is incentivized to keep it whole, quietly reducing token float.
 
 ## Economic Model
 
@@ -120,25 +124,27 @@ Primary palette: Base blue, aquamarine, emerald, deep navy, white highlights. Ra
 
 ## Trait System
 
-Trait categories:
+Each trait is a formation property — what the chain conditions imprinted on the fragment as it crystallized. All traits are derived deterministically from the token's seed and read directly from the contract.
 
-- `Beryl Color`
-- `Cut`
-- `Facet Pattern`
-- `Inclusion`
-- `Clarity`
-- `Background`
-- `Class`
-- `Mythic`
+| Trait | Meaning | Values (rarest last) |
+| --- | --- | --- |
+| `Beryl Color` | The mineral vein the fragment grew from | Aquamarine, Emerald, Heliodor, Morganite, Goshenite, Red Beryl |
+| `Cut` | How the lattice fractured under pressure — **drives the crystal silhouette** | Hex, Prism, Shard, Step, Needle, Royal |
+| `Facet Pattern` | Internal refraction geometry | Plain, Cross, Crown, Deep, Star, Mythic |
+| `Inclusion` | What was trapped inside during formation | None, Vein, Bubble, Rutiled, Core, Ancient |
+| `Clarity` | Transparency grade (sets the highlight color) | Clear, Bright, Glass, Prismatic, Flawless, Singular |
+| `Background` | The chain-stratum the fragment was pulled from | Base Grid, Deep Blue, Vault, Signal, Night, Abyss |
+| `Class` | When in the curve's life it was forged | Standard, Signal, Founder |
+| `Mythic` | Touched by the Beryl core itself (~1%) | rendered with gold edges |
 
 Special classes:
 
-- `Founder Bit`: token IDs `1-200`.
+- `Founder Bit`: token IDs `1-200` — the genesis fragments of the Beryl era.
 - `Signal Bit`: first `20` token IDs in each `500` token band after class calculation.
 - `Standard Bit`: all other tokens.
-- `Mythic`: approximately `1%`, determined by seed.
+- `Mythic`: approximately `1%`, determined by seed; visually distinct (gold edges and core).
 
-Class affects metadata only in v1; it does not add visual symbols or payout differences.
+Visual vs metadata: `Cut` shapes the silhouette, `Beryl Color`/`Clarity` set the palette, `Facet Pattern` and `Inclusion` paint interior pixels, `Background` sets the field, and `Mythic` adds gold edges. `Class` (Founder/Signal/Standard) is metadata-only — collectible provenance, with no visual symbol or payout difference in v1.
 
 ## What We Gain
 
