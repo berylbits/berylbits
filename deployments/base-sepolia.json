@@ -68,6 +68,14 @@
     "oldForgeMintRevoke": "0x483854c8fdc8c00e4fb713fa60d16a8be632111062637c5fb74e66c74fa22751",
     "oldForgeBurnRevoke": "0xe4968152a30b2cc8424e6d1f02af094795c39200329cff9602158e4fa9ebc3d1"
   },
+  "v5NftCutShapes": {
+    "date": "2026-06-26",
+    "summary": "NFT art upgrade: Cut trait now drives a distinct crystal silhouette (was metadata-only). Hex (default) unchanged byte-for-byte; Prism/Needle/Royal/Step/Shard get new shapes. Storage unchanged -> in-place proxy upgrade.",
+    "newNftImplementation": "0x8D7e725d4EB380349cBe4b4c91ACCB3AF5c76126",
+    "nftProxy": "0x3848C9d288bef5083Ea6ca6C5262C7763559d427",
+    "upgradeTx": "0x5d0771c29910a923c8fb5c231e577961a1482c8a5f23898f68fb6a3b07df70b2",
+    "verifiedOnchain": "token#6 (Needle) clusters at cols 7-8 (thin spire); token#3 (Hex) spreads cols 4-11 (diamond) - Cut now visually distinct"
+  },
   "v4Curve8BandRedeploy": {
     "date": "2026-06-26",
     "summary": "Fresh 8-band curve proxy (storage array [5]->[8] required a new proxy). Forge re-pointed, B20 mint/burn moved to new curve, team sell lock set to 1000.",

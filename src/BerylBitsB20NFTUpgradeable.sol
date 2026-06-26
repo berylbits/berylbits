@@ -255,8 +255,7 @@ contract BerylBitsB20NFTUpgradeable is BerylBitsUpgradeableBase {
     function _crystalPixel(uint256 x, uint256 y, TraitSet memory traits) internal pure returns (string memory) {
         // Centered beryl crystal silhouette. No eyes, face, antenna, aura, markers, or text.
         if (y < 3 || y > 12) return "";
-        uint256 left = y <= 7 ? 8 - ((y - 1) / 2) : 4 + ((y - 8) / 2);
-        uint256 right = y <= 7 ? 7 + ((y - 1) / 2) : 11 - ((y - 8) / 2);
+        (uint256 left, uint256 right) = _cutBounds(y, traits.cut);
         if (x < left || x > right) return "";
 
         string memory edge = traits.mythic ? "#f6b73c" : "#07112d";
@@ -271,6 +270,52 @@ contract BerylBitsB20NFTUpgradeable is BerylBitsUpgradeableBase {
         if ((x <= 6 && y >= 6) || (x == 5 && y >= 5)) return shadow;
         if ((x >= 9 && y <= 9) || (x == 10 && y >= 5 && y <= 10)) return light;
         return color;
+    }
+
+    /// @dev Per-row crystal silhouette bounds, varied by Cut.
+    /// Hex returns the original silhouette unchanged (canonical look); the other
+    /// cuts add distinct centered shapes that previously rendered identically.
+    function _cutBounds(uint256 y, string memory cut) internal pure returns (uint256 left, uint256 right) {
+        bytes32 kind = keccak256(bytes(cut));
+
+        if (kind == keccak256("Prism")) {
+            // Beveled vertical column.
+            if (y == 3 || y == 12) return (7, 8);
+            return (6, 9);
+        }
+        if (kind == keccak256("Needle")) {
+            // Thin tall spire with a small mid bulge.
+            if (y == 8 || y == 9) return (6, 9);
+            return (7, 8);
+        }
+        if (kind == keccak256("Royal")) {
+            // Wide, full-bodied gem.
+            if (y == 3 || y == 12) return (6, 9);
+            if (y == 4 || y == 5 || y == 11) return (5, 10);
+            return (4, 11);
+        }
+        if (kind == keccak256("Step")) {
+            // Terraced diamond with stepped sides.
+            if (y == 3 || y == 4 || y == 11 || y == 12) return (7, 8);
+            if (y == 5 || y == 6 || y == 9 || y == 10) return (6, 9);
+            return (5, 10);
+        }
+        if (kind == keccak256("Shard")) {
+            // Asymmetric, right-leaning fractured crystal.
+            if (y == 3) return (7, 9);
+            if (y == 4) return (7, 10);
+            if (y == 5) return (6, 10);
+            if (y == 6 || y == 7) return (6, 11);
+            if (y == 8) return (5, 11);
+            if (y == 9) return (5, 10);
+            if (y == 10) return (6, 10);
+            if (y == 11) return (6, 9);
+            return (7, 9); // y == 12
+        }
+
+        // Hex (default) — original silhouette, byte-for-byte unchanged.
+        left = y <= 7 ? 8 - ((y - 1) / 2) : 4 + ((y - 8) / 2);
+        right = y <= 7 ? 7 + ((y - 1) / 2) : 11 - ((y - 8) / 2);
     }
 
     function _facetPixel(uint256 x, uint256 y, string memory facetPattern) internal pure returns (bool) {
