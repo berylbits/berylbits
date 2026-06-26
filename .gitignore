@@ -1,0 +1,22 @@
+# --- Secrets (never commit) ---
+.env
+.env.*
+.env.deployer
+*.env
+**/.env
+**/.env.*
+.keystores/
+**/.keystores/
+*.key
+*.pem
+*keystore*
+secrets/
+.secrets
+
+# --- Build / deps / artifacts ---
+cache/
+broadcast/
+out/
+node_modules/
+dist/
+*.tsbuildinfo

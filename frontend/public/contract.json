@@ -1,0 +1,14 @@
+{
+  "name": "Beryl Bits",
+  "symbol": "BBITS",
+  "description": "Beryl Bits is a Base-native token-to-onchain-crystal primitive built on the B20 standard. One token can be forged into one fully onchain pixel beryl NFT, and one NFT can be redeemed back into one token.",
+  "image": "https://berylbits.xyz/beryl-bits.png",
+  "external_link": "https://berylbits.xyz",
+  "seller_fee_basis_points": 0,
+  "fee_recipient": "0x0000000000000000000000000000000000000000",
+  "network": "base",
+  "chain_id": 8453,
+  "testnet_chain_id": 84532,
+  "b20_policy_gating": "disabled_v1",
+  "primitive": "1 token <-> 1 NFT"
+}

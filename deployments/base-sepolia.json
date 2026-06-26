@@ -1,0 +1,222 @@
+{
+  "network": "base-sepolia",
+  "chainId": 84532,
+  "deployer": "0xF00e1844903586a83a7A2d8ec28f4DCB5e31DeCa",
+  "admin": "0xF00e1844903586a83a7A2d8ec28f4DCB5e31DeCa",
+  "treasury": "0xF00e1844903586a83a7A2d8ec28f4DCB5e31DeCa",
+  "team": "0xF00e1844903586a83a7A2d8ec28f4DCB5e31DeCa",
+  "b20": {
+    "token": "0xB20000000000000000000069d62bC417C3c5ca7E",
+    "name": "Beryl Bits",
+    "symbol": "BBITS",
+    "salt": "0x8079abd3ce312289af81d63e46d22ff2a5f63a5972224c0b05fabaebc0ccc820",
+    "supplyCap": "10000000000000000000000",
+    "teamSupply": "25000000000000000000",
+    "createTx": "0x682cf2f945c994bb1c192b2e6b23abe67dd591faac81187745e357a7e2ae9452",
+    "nativeRoleHashes": {
+      "MINT_ROLE": "0x154c00819833dac601ee5ddded6fda79d9d8b506b911b3dbd54cdb95fe6c3686",
+      "BURN_ROLE": "0xe97b137254058bd94f28d2f3eb79e2d34074ffb488d042e3bc958e0a57d2fa22"
+    }
+  },
+  "upgradeableContracts": {
+    "nftImplementation": "0xB0668f599828d7517d0482B531798ca08A4cB40c",
+    "nftProxy": "0x3848C9d288bef5083Ea6ca6C5262C7763559d427",
+    "forgeImplementation": "0x26CBe98F63680221f99bB59f0994ec38D7e98CD8",
+    "forgeProxy": "0x272d1CBdf4f8D7091A958Af28746990a921BBd68",
+    "curveImplementation": "0x6fB9A2f036c4375bAFd49a1599e5741824b865e0",
+    "curveProxy": "0x5A0Ee112843DdA023b778c77cffb9904407188E0"
+  },
+  "deployTxs": {
+    "nftImplementation": "0xeab040335c29d76aed686524373998f8143b06ca0d8a2b0b116a41014dfec18b",
+    "nftProxy": "0x72f8823615e7b50691e97090169d0d8b57f1416b4ce29c2cb1061ccad16c610e",
+    "forgeImplementation": "0x460825362d7ae2c1881b4fc62ad32c8dee5ff29574256a1ad250234f04965fc7",
+    "forgeProxy": "0xc4baf1cbd9280f147ffabe682073fe28e157e517c7dbd449fa5b506e39454239",
+    "curveImplementation": "0x3908a5f44b8a7a25deda59c8c9b6f7df4cb04469af2378894e9d2e23895c5ef0",
+    "curveProxy": "0xfa37dd82169130d65383096655f4c215bcec0353913a87f0a5edc57ce4c88b37",
+    "nftForgeRoleGrant": "0xce16917b76b108af76bc9c3f75cd8403d5e2d45f81498344ad0baf70f1da1e97",
+    "forgeInitializeV2": "0x6b587e283ab0935899eac248d6d825e3a8fed05b28e2d5cbba118ad9a86dd04d"
+  },
+  "v2UpgradeTxs": {
+    "curveImplementation": "0x60b1dbb8e18521935dea04b2fb47edb37bea826de691795df591994997708bb6",
+    "curveUpgrade": "0xd473eb024711b106cd19b0ac1f5ccb31cb5d6978d8f98a6d113391990665f28d",
+    "forgeImplementation": "0x300c0fa70d042fa5c50b2bdf1142685d4216cebe2cd72f79e44cc87d795746d2",
+    "forgeUpgradeAndInitializeV2": "0xe646b57140ddb75f934a81bd9a808f4ca56a99a167326dcf385220a56963eb52"
+  },
+  "economicsUpgradeTxs": {
+    "date": "2026-06-26",
+    "curveImplementation": "0x99575bd9308ae4aebfb494de5a8a84a80ba778b4c1510abef6d85ff493f07729",
+    "curveImplementationAddress": "0x6fB9A2f036c4375bAFd49a1599e5741824b865e0",
+    "curveUpgrade": "0xa51947616260061fc151caa6eb272874a3fe0b2d4b2f4999fe980f095a5dbf3d"
+  },
+  "teamVesting": {
+    "contract": "0x781a02c6E8E9AbB2aC71c1d8FE4B8434aD8903E5",
+    "beneficiary": "0xF00e1844903586a83a7A2d8ec28f4DCB5e31DeCa",
+    "allocation": "200000000000000000000",
+    "cliffDurationSeconds": 15552000,
+    "linearDurationSeconds": 46656000,
+    "deployTx": "0x93d620d0af31fad3598de5e844c9fbe12c3d5db0bbe60fa8b853ef9193f6f942",
+    "fundTx": "0x55c8c6dcc994876353746da444ced29c3a1a6073ecf874909d6923bdc7f9ddf6"
+  },
+  "b20RoleTxs": {
+    "newCurveMintGrant": "0xe703c6e86aaace2fa1d0f1d99dbcc21f54c790b84d9978f533288d232dd14138",
+    "newCurveBurnGrant": "0x70e968f39f668668f5d9ec234955e9ec336023bc9cc0ef3a47edd7d8aa77564c",
+    "newForgeMintGrant": "0x8e9a52e7ceaadc9498a1e4d49b7459a50d640da0414b48af59cee5bb4f6019a6",
+    "newForgeBurnGrant": "0x9b78e5989ee8f994532f499ac15dddfe28bf3e252329b04ca6192d8749e0faa5",
+    "oldCurveMintRevoke": "0x6530006e4622567db04130da56bf57219c01e16db6ef9514936aba75c5ac3700",
+    "oldCurveBurnRevoke": "0xd9bdfd208c17be5bf3f96ef75ac2935e6cbdeec514df2d2f425d8c2d72678a27",
+    "oldForgeMintRevoke": "0x483854c8fdc8c00e4fb713fa60d16a8be632111062637c5fb74e66c74fa22751",
+    "oldForgeBurnRevoke": "0xe4968152a30b2cc8424e6d1f02af094795c39200329cff9602158e4fa9ebc3d1"
+  },
+  "v3UpgradeTxs": {
+    "date": "2026-06-26",
+    "summary": "Added curve team sell lock, removed forgeWithPermit from forge.",
+    "curveImplementationAddress": "0x10455EC9A64D20CcA736d2a92B67c6BE55e8624a",
+    "forgeImplementationAddress": "0x979215246711b24594276216790e4e9B2a378819",
+    "curveImplementationCreate": "0xcd9324b1c0cc93e061dd823eb0991c695c9d3dac27f8407106d29fced8157e19",
+    "curveUpgrade": "0xb3818d0e54de5d4b3531c05295fe64ad433577d472f1c3a977c42d0b197ae990",
+    "forgeImplementationCreate": "0xd9972785922397528d81cca09732b8af2835fae36a8e7693878f85f825747a3c",
+    "forgeUpgrade": "0xd808aac871e3e8ef5fec2179aa813f14d2397ee2dd5cf9a5e24ab06ce5ec4e9f",
+    "setTeamSellLock": "0xc97001813401ea7e54b80de962d60211e29d9a222fa30aa7ffd1df5f9927509b",
+    "teamSellUnlockUnitsTestnet": 10,
+    "note": "teamSellUnlockUnits set to 10 on testnet for demonstration; mainnet threshold is a launch-time decision."
+  },
+  "v3E2ETests": {
+    "date": "2026-06-26",
+    "teamSellLockedRevert": "TeamSellLocked(4,10) confirmed at outstanding=4 < unlock=10",
+    "teamSellUnlockedAfterThreshold": "0xd29f03ec994975dfac55ad9fa8f18a9e5bd86285d1ca7690742ebb76d74eb197",
+    "forgeWithPermitRemoved": "selector now reverts (function removed)",
+    "forgeStoragePreserved": "forge.curve() still returns curve proxy after upgrade",
+    "regressionSmoke": "buy->forge->redeemAndSell and buy->forge->redeem->sell both passed with lock temporarily disabled"
+  },
+  "teamMintTxs": {
+    "temporaryMintRoleGrant": "0x9bed1a279a834fc6206539ceb2d1c2f70cdc05744cfac71cde07c129f3f6e565",
+    "teamMint": "0x91c2e8603a863e48d707e4b9ac629278ab237795ba7ab5e6adf9e9c0459dd30b",
+    "temporaryMintRoleRevoke": "0xde87ef7c1bbff899b59d33b998690f1bd0fca8e2d2ac9182411b3fb7d6030848"
+  },
+  "smokeTestTxs": {
+    "buy": "0x69d50d7a75fe9843183224a29d8c672ba3245ae5c84dc536d7943f1135a2ab3c",
+    "approveForge": "0xd84499d39db790f12c123baa03454df6a24466b4fda3e9c4cc19a479aa457b10",
+    "forge": "0x41dd940a7b23a8dc8ba8081d0ccd8d499f44cbf0d3cca662d00dbad23260fe9b",
+    "redeem": "0xa6f04a61961e3de8835ac688c1f8e3c77ee7579155b4c13054733207dc3c690a",
+    "approveCurve": "0x183e582cfcbb004bbb7e68835ca0ddd29f9b2fdab252e386279617e50c454061",
+    "sell": "0xa0774b913962cd31e55c721815bf896351e9fe4b905824630cc8a4b30e6e4ad5"
+  },
+  "v2SmokeTestTxs": {
+    "buyWithMaxCost": "0x92d1cfa1eb1f83f901f41ff34a1d76dfc03aa5129ff6028acb9fb71b641da221",
+    "approveForge": "0x8e8c73ff7c563f472ad60599982986b3e8e2c86bfb557ae4ffb2858e60ff42fe",
+    "forge": "0xcb53f4060c920b2fc2b8dbc5ecc78caa184ab412849e9e37e277e72bc36359ff",
+    "redeemAndSell": "0x2eddd0c98837d3e955d7797a830f026d79db9d2374678db3d2505108b2fbabd7"
+  },
+  "multiSmokeTestTxs": {
+    "runbook": "script/sepolia-smoke.sh",
+    "flow1": {
+      "buyWithMaxCost": "0xb43d83f542533e8423ad74ba49fd94e5894d22c48a8381943d74e50baa9e8e34",
+      "approveForge": "0x768ad013ae94bba3be0d61ecf46443398ba1ed5c1288ee22fb00583032b0d248",
+      "forge": "0x2287937ea3da44677d3d20317cb1202fbd7468d1e8559b06d19325e5ff5f6b69",
+      "redeemAndSell": "0xdfb495405db52615ad681b3c21576bd1106ec057f26c67046ac1ffcb786a9fe8",
+      "tokenId": 3,
+      "minPayout": "1840000000000000"
+    },
+    "flow2": {
+      "buyWithMaxCost": "0xb1b6d725121cd6512ea9870573052f88f1e68dc21473eea04ed796cab371e41d",
+      "approveForge": "0x836dceaf24c81c2bd1ca9660cf55257801b4f69b3ca65f6d97c94f3a0aebc833",
+      "forge": "0xb6d6463dd62886396eaedef39d2c0b050499757e42258ac9a02f546963b2d028",
+      "redeem": "0x0e972a8068f1434a12f13f29eaf68e80d903ed6498b11a05bc9dab8ae59ce3ac",
+      "approveCurve": "0x6144f734c75092ec175f69ab5e6ce44548d33b8bbf1ee041c3239d6ec0e2d15f",
+      "sell": "0x6d8ca9ca8c3a8fe94342f35458072d21b37020a17c015e3af84a01e2ab3d2604",
+      "tokenIds": [4, 5],
+      "buyCost": "4000000000000000",
+      "minPayout": "1840000000000000"
+    }
+  },
+  "multiSmokeFinalState": {
+    "b20TotalSupply": "200000000000000000000",
+    "deployerB20Balance": "0",
+    "deployerNftBalance": "1",
+    "nftLiveSupply": "1",
+    "nftTotalMinted": "5",
+    "marketOutstandingUnits": "1",
+    "curveEthBalance": "1840000000000000"
+  },
+  "latestSmokeTestTxs": {
+    "runbook": "script/sepolia-smoke.sh",
+    "date": "2026-06-26",
+    "flow1": {
+      "buyWithMaxCost": "0x5ab4453d89606ae7a2f1bc39d4df8896f2e9fe8d75a5561f51584ad073930771",
+      "approveForge": "0xebfa3fd09e266f682cc3eb0ce42da70b57da254eef8e542c7d60b94050c3b7f9",
+      "forge": "0x36ad8bfff9dea7cfce044c6440aaae54b672b885321e37e77db3891b64c7c4bc",
+      "redeemAndSell": "0x52a6c6f581dbab6eac5237601c4581d9ec9520e640727cdf5cb5dcc57817b6c7",
+      "tokenId": 4,
+      "buyCost": "500000000000000",
+      "minPayout": "460000000000000"
+    },
+    "flow2": {
+      "buyWithMaxCost": "0xb1c559c87ad5605d59b2a935fa1da16f353e2da72d8a964231e6e8fd3b018e83",
+      "approveForge": "0x6a07e5615945df4c582145b9630d12390a7375529af460c08d0bf486d0f29b58",
+      "forge": "0x17f5f553d8e0bef798d6f996e12deaea81be9f3de736b20dd26d7a5b58663fb4",
+      "redeem": "0x0b3d600679b07e50ac8540e7d9e7fc34deabbb2945b2d0049637e4e5a3658ad2",
+      "approveCurve": "0x897db7433ce271934b2f08c928c2b5e78d9065b20e50ff14d373af5eb188e294",
+      "sell": "0xc741b5bf05a208bdc897125a71310bf9f5df48d7d2c6c60b3c6c7817cab79cb0",
+      "tokenIds": [5, 6],
+      "buyCost": "1000000000000000",
+      "minPayout": "460000000000000"
+    }
+  },
+  "latestSmokeFinalState": {
+    "b20TotalSupply": "25000000000000000000",
+    "deployerB20Balance": "25000000000000000000",
+    "deployerNftBalance": "2",
+    "deployerOwnedTokenIds": [3, 6],
+    "nftLiveSupply": "2",
+    "nftTotalMinted": "6",
+    "marketOutstandingUnits": "2",
+    "curveEthBalance": "940000000000000"
+  },
+  "frontend": {
+    "path": "frontend",
+    "chainId": 84532,
+    "stack": "Vite + React + TypeScript + wagmi + viem",
+    "tabs": ["Trade", "Forge", "Redeem", "Docs", "System"],
+    "publicEnvExample": "frontend/env.example",
+    "privateKeyExposure": false
+  },
+  "smokeFinalState": {
+    "b20TotalSupply": "200000000000000000000",
+    "teamB20Balance": "0",
+    "teamVestingB20Balance": "200000000000000000000",
+    "deployerB20Balance": "0",
+    "deployerNftBalance": "0",
+    "nftLiveSupply": "0",
+    "nftTotalMinted": "2",
+    "marketOutstandingUnits": "0",
+    "curveEthBalance": "0",
+    "forgeB20Balance": "0"
+  },
+  "svgSmokeCheck": {
+    "tokenId": 1,
+    "byteLength": 4080,
+    "rectCount": 56,
+    "hasTextFontEyesAntennaAura": false,
+    "hasCrispEdges": true,
+    "hasCenteredCrystalMarkers": true
+  },
+  "roleCheck": {
+    "newCurveMint": true,
+    "newCurveBurn": true,
+    "newForgeMint": true,
+    "newForgeBurn": true,
+    "oldCurveMint": false,
+    "oldCurveBurn": false,
+    "oldForgeMint": false,
+    "oldForgeBurn": false,
+    "deployerMint": false,
+    "deployerBurn": false
+  },
+  "latestMetadataTxs": {
+    "metadataRoleGrant": "0xfa895ec0b3a90fef5ff4416175728d5f1b0c1e97254a6a9b547e2ceb6e05b2ad",
+    "nftContract": "0x683a6f2b29b22ae89f3d6c94aa04547bbfe829258431d8ab06c2cb4d71e5da46",
+    "forgeContract": "0x4b682801401cde04cac2692d063c045233e39a93e0976222b6915c05b6de2261",
+    "curveContract": "0x2ce0cf70af25b983757ea64da8cca5170e67e0c2d11253f2686ffdb941b87d35",
+    "teamAllocation": "0x42d3ec0f9bb4a388a60c9ff6f0c28649db6d702646373e9eade4bce7a634bc2b"
+  }
+}
