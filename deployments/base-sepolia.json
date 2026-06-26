@@ -79,6 +79,15 @@
     "verifiedOnchain": "buy(26) reverts WalletBuyCapExceeded(26,25); real buy(2) -> curveBoughtUnits=2; buy(24) more reverts cumulative 26>25",
     "note": "Sybil-soft speed bump. Admin can raise/disable via setMaxBuyUnitsPerWallet after launch rush."
   },
+  "v7NftRareTiers": {
+    "date": "2026-06-26",
+    "summary": "NFT art upgrade: Mythic now twinkles (animated sparkles); new Radiant chase tier (~0.1%) adds brighter edges + a holographic shine sweep. Added previewSVG(seed,tokenId) pure helper and a Radiant attribute. Storage unchanged -> in-place upgrade.",
+    "newNftImplementation": "0xf587292A76b7966cDc0ea4272eD8E7d0829259bA",
+    "nftProxy": "0x3848C9d288bef5083Ea6ca6C5262C7763559d427",
+    "upgradeTx": "0xe9f39a7ff6a9fc03c7739596fbb51438848b23c84536b11f08d6da138bd3746f",
+    "radiantOdds": "1 in 1000",
+    "verifiedOnchain": "previewSVG renders post-upgrade; token#3 tokenURI now includes Mythic/Radiant attributes"
+  },
   "v5NftCutShapes": {
     "date": "2026-06-26",
     "summary": "NFT art upgrade: Cut trait now drives a distinct crystal silhouette (was metadata-only). Hex (default) unchanged byte-for-byte; Prism/Needle/Royal/Step/Shard get new shapes. Storage unchanged -> in-place proxy upgrade.",

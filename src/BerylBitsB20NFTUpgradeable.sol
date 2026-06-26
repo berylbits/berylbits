@@ -21,6 +21,7 @@ contract BerylBitsB20NFTUpgradeable is BerylBitsUpgradeableBase {
         string backgroundName;
         string className;
         bool mythic;
+        bool radiant;
     }
 
     string private _name;
@@ -170,8 +171,15 @@ contract BerylBitsB20NFTUpgradeable is BerylBitsUpgradeableBase {
     }
 
     function traitSet(uint256 tokenId) public view returns (TraitSet memory traits) {
-        bytes32 seed = tokenSeed[tokenId];
+        return _traitsFromSeed(tokenSeed[tokenId], tokenId);
+    }
 
+    /// @notice Render a crystal directly from a seed without minting. Useful for previews.
+    function previewSVG(bytes32 seed, uint256 tokenId) external pure returns (string memory) {
+        return _renderSvg(_traitsFromSeed(seed, tokenId));
+    }
+
+    function _traitsFromSeed(bytes32 seed, uint256 tokenId) internal pure returns (TraitSet memory traits) {
         traits.berylColor = _pickTrait(seed, 0, 100, [uint256(34), 58, 76, 89, 97, 100], ["Aquamarine", "Emerald", "Heliodor", "Morganite", "Goshenite", "Red Beryl"]);
         traits.cut = _pickTrait(seed, 1, 100, [uint256(34), 58, 76, 90, 98, 100], ["Hex", "Prism", "Shard", "Step", "Needle", "Royal"]);
         traits.facetPattern = _pickTrait(seed, 2, 100, [uint256(30), 54, 75, 90, 98, 100], ["Plain", "Cross", "Crown", "Deep", "Star", "Mythic"]);
@@ -180,6 +188,7 @@ contract BerylBitsB20NFTUpgradeable is BerylBitsUpgradeableBase {
         traits.backgroundName = _pickTrait(seed, 5, 100, [uint256(32), 56, 74, 88, 96, 100], ["Base Grid", "Deep Blue", "Vault", "Signal", "Night", "Abyss"]);
         traits.className = _className(tokenId);
         traits.mythic = uint256(keccak256(abi.encode(seed, "MYTHIC"))) % 100 == 0;
+        traits.radiant = uint256(keccak256(abi.encode(seed, "RADIANT"))) % 1000 == 0;
     }
 
     function _className(uint256 tokenId) internal pure returns (string memory) {
@@ -206,6 +215,8 @@ contract BerylBitsB20NFTUpgradeable is BerylBitsUpgradeableBase {
             _trait("Class", traits.className),
             ",",
             _trait("Mythic", traits.mythic ? "Yes" : "No"),
+            ",",
+            _trait("Radiant", traits.radiant ? "Yes" : "No"),
             "]"
         );
     }
@@ -229,7 +240,31 @@ contract BerylBitsB20NFTUpgradeable is BerylBitsUpgradeableBase {
             }
         }
 
-        return string.concat(svg, "</svg>");
+        return string.concat(svg, _effects(traits), "</svg>");
+    }
+
+    /// @dev Animated overlays for the rare tiers. Mythic adds twinkling sparkles;
+    /// Radiant adds a holographic shine sweep on top. Pure pixel/SVG, no text.
+    function _effects(TraitSet memory traits) internal pure returns (string memory) {
+        if (!traits.mythic && !traits.radiant) return "";
+
+        string memory fx = string.concat(
+            '<rect x="180" y="120" width="20" height="20" fill="#ffffff" opacity="0">',
+            '<animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite"/></rect>',
+            '<rect x="120" y="160" width="20" height="20" fill="#fff7d6" opacity="0">',
+            '<animate attributeName="opacity" values="0;0.9;0" dur="2.6s" begin="0.7s" repeatCount="indefinite"/></rect>'
+        );
+
+        if (traits.radiant) {
+            fx = string.concat(
+                fx,
+                '<g transform="skewX(-18)"><rect x="-60" y="-40" width="34" height="400" fill="#ffffff" opacity="0.16">',
+                '<animateTransform attributeName="transform" type="translate" values="0 0;480 0" dur="2.4s" repeatCount="indefinite"/>',
+                '</rect></g>'
+            );
+        }
+
+        return fx;
     }
 
     function _pickTrait(
@@ -258,7 +293,7 @@ contract BerylBitsB20NFTUpgradeable is BerylBitsUpgradeableBase {
         (uint256 left, uint256 right) = _cutBounds(y, traits.cut);
         if (x < left || x > right) return "";
 
-        string memory edge = traits.mythic ? "#f6b73c" : "#07112d";
+        string memory edge = traits.radiant ? "#fff0a8" : (traits.mythic ? "#f6b73c" : "#07112d");
         if (x == left || x == right || y == 3 || y == 12) return edge;
 
         string memory color = _berylColor(traits.berylColor);

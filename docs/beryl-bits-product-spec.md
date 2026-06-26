@@ -135,7 +135,8 @@ Each trait is a formation property — what the chain conditions imprinted on th
 | `Clarity` | Transparency grade (sets the highlight color) | Clear, Bright, Glass, Prismatic, Flawless, Singular |
 | `Background` | The chain-stratum the fragment was pulled from | Base Grid, Deep Blue, Vault, Signal, Night, Abyss |
 | `Class` | When in the curve's life it was forged | Standard, Signal, Founder |
-| `Mythic` | Touched by the Beryl core itself (~1%) | rendered with gold edges |
+| `Mythic` | Touched by the Beryl core itself (~1%) | gold edges + animated twinkle |
+| `Radiant` | The rarest chase tier (~0.1%) | bright edges + animated holographic shine sweep |
 
 Special classes:
 
