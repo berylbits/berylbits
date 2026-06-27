@@ -9,7 +9,7 @@ source .env
 set +a
 
 CAST_BIN="${CAST_BIN:-$(command -v base-cast || command -v cast)}"
-RPC_URL="${RPC_URL:-https://sepolia.base.org}"
+RPC_URL="${RPC_URL:-https://mainnet.base.org}"
 
 B20_FACTORY="0xB20f000000000000000000000000000000000000"
 ACTIVATION_REGISTRY="0x8453000000000000000000000000000000000001"

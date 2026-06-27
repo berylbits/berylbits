@@ -80,4 +80,6 @@ abstract contract BerylBitsUpgradeableBase is Initializable, UUPSUpgradeable {
     }
 
     function _authorizeUpgrade(address) internal override onlyRole(UPGRADER_ROLE) {}
+
+    uint256[48] private __gap;
 }
