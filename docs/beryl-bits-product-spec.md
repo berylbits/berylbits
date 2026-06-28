@@ -180,10 +180,15 @@ Resolved after the latest review pass:
 
 - `forgeWithPermit` is removed. Only the standard approve-and-forge path remains, eliminating the permit-nonce griefing vector.
 - Team allocation now carries an on-chain sell lock: the team wallet cannot pull ETH from the curve until public `marketOutstandingUnits` reaches a configured unlock threshold (`setTeamSellLock`). This is a credible commitment that ETH backing exists before any team exit.
+- `BerylBitsUpgradeableBase` now reserves a `uint256[48] __gap` so the shared base contract can gain storage in a future upgrade without colliding with curve/forge/NFT child storage.
+
+A 12-agent pashov-style pass was run on the final scope. It surfaced no new mainnet blocker; the team sell lock, fixed treasury, and buy-cap accounting were triaged as accepted v1 decisions / documented leads (see architecture doc). The full system was redeployed fresh on Sepolia (`2026-06-28`) and re-tested end to end: team and public-user flows, the 8-band price table, multi-band buy pricing, wallet buy cap enforcement, and curve/forge/NFT pause-unpause all passed.
 
 Remaining review leads:
 
 - Trait randomness uses block-derived entropy and can be timing-influenced. This is acceptable for v1 only if rarity remains collectible metadata, not financial utility. Practical manipulation requires sequencer/block-producer cooperation, which is low risk on Base today.
+- Buy-cap accounting only records buys while a cap is active; enable the per-wallet cap before opening public buys (or leave it at `0`).
+- Treasury is fixed at `initialize` with no setter; safe while it is the deployer EOA, a `setTreasury` is the recommended hardening if it ever becomes a contract.
 - Current governance decision keeps deployer as final authority. Safer hardening remains Safe/timelock migration.
 
 ## Mainnet Positioning
@@ -194,10 +199,10 @@ Beryl Bits should be positioned as a Base-native token/NFT conversion primitive 
 
 The current frontend is a lightweight tabbed app:
 
-- `Trade`: buy/sell interface with percentage-based price protection.
+- `Trade`: buy/sell interface with percentage-based price protection. The panel is kept minimal — only the input, the slippage-protected output quote, and protection controls. Fee/spread details (8% buy fee, 92% sell payout, round-trip cost) are not repeated here; they live in the `Docs` tab. Trade size is bounded per wallet: a buy is limited to the wallet's remaining buy-cap allowance, a sell to the wallet's token balance, and the button is disabled with an inline warning when the entered amount exceeds that limit.
 - `Forge`: token approval and forge flow.
 - `Redeem`: wallet crystal scanner, manual token ID fallback, redeem, and redeem-and-sell.
-- `Docs`: short user-facing explanation of the primitive, curve, NFT generation, and risks.
+- `Docs`: short user-facing explanation of the primitive, curve, fees, NFT generation, and risks.
 - `System`: contract addresses and public state.
 
 Wallet connection uses RainbowKit with project ID `3c7c133910c85aa281f3dc73f2ce2848`. The frontend reads `VITE_RAINBOW_PROJECT_ID` first and falls back to `VITE_WALLETCONNECT_PROJECT_ID`. The UI is still testnet-targeted internally, but visible copy should avoid over-emphasizing the testnet name unless needed for safety.

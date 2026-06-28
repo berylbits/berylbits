@@ -27,6 +27,9 @@ Completed:
 - Pashov-style AI security review high-confidence findings were patched locally: live-supply NFT cap, admin-only `initializeV2`, and non-upgradeable forge reentrancy guard.
 - V3 upgrade shipped to Sepolia on `2026-06-26`: curve team sell lock added (`setTeamSellLock`), `forgeWithPermit` removed from forge. New curve impl `0x10455EC9A64D20CcA736d2a92B67c6BE55e8624a`, forge impl `0x979215246711b24594276216790e4e9B2a378819`.
 - V3 E2E verified onchain: team sell reverts `TeamSellLocked` below the unlock threshold and succeeds once public demand reaches it; `forgeWithPermit` selector now reverts; forge `curve()` storage preserved; full buy/forge/redeem/sell regression smoke passed.
+- `2026-06-28` mainnet-prep pass: added `uint256[48] __gap` to `BerylBitsUpgradeableBase`; added `GrantBerylBitsB20Roles.s.sol` (the previously-manual B20 mint/burn role grant); pointed `b20-readiness.sh` at Base mainnet; ran a 12-agent pashov-style review (one credible-commitment finding on the team sell lock plus documented leads, no new blocker).
+- `2026-06-28` fresh full Sepolia rehearsal (new B20 + new curve/forge/NFT proxies) verified end to end: team-wallet and a separately funded public-user wallet both ran buy → forge → redeem → sell / redeemAndSell; the 8-band price table matched spec exactly; multi-band buy pricing crossed bands correctly; `setMaxBuyUnitsPerWallet` enforced `WalletBuyCapExceeded`; and curve/forge/NFT pause-unpause all behaved. Confirmed live the buy-cap accounting gap (buys made while the cap is `0` are not tracked).
+- Frontend buy panel simplified: fee/spread readouts removed from the Trade tab (fees documented only in the Docs tab) and trade size bounded per wallet (buy ≤ remaining cap, sell ≤ token balance, button disabled with a warning past the limit).
 
 Not complete:
 
@@ -140,9 +143,9 @@ Current decision notes:
 3. Prepare mainnet `.env` with deployer wallet for treasury, admin/multisig, timelock, and team beneficiary.
 4. Deploy the native Base B20 asset with supply cap `10,000 ether`.
 5. Deploy the UUPS curve, forge, and NFT proxy set.
-6. Grant B20 `MINT_ROLE` and `BURN_ROLE` to curve and forge.
+6. Grant B20 `MINT_ROLE` and `BURN_ROLE` to curve and forge via `GrantBerylBitsB20Roles.s.sol` (`base-forge --skip-simulation`).
 7. Configure B20 metadata: NFT contract, forge contract, curve contract, team wallet, and team allocation.
-8. Direct-mint `25` off-curve team tokens to deployer/team wallet, then revoke temporary deployer mint role.
+8. Direct-mint `25` off-curve team tokens to deployer/team wallet (run `MintBerylBitsTeamAllocation` with `--slow`), then revoke temporary deployer mint role.
 9. Call `curve.setTeamSellLock(TEAM_ADDRESS, unlockUnits)` with the chosen mainnet unlock threshold.
 10. Verify economics onchain: buy fee `800 bps`, sell payout `9200 bps`, `quoteBuy(1)=0.0005 ETH`, `quoteSell(1)=0.00046 ETH`.
 11. Run B20 readiness checks: activation, `isB20`, and curve/forge role checks.

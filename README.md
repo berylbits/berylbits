@@ -111,12 +111,14 @@ npm run dev
 High-level order:
 
 1. `CreateBerylBitsB20Token` — create the B20 asset (supply cap `10,000`, contractURI, extraMetadata).
-2. Deploy UUPS curve / forge / NFT implementations + proxies.
-3. Grant NFT `FORGE_ROLE` to forge; grant B20 `MINT_ROLE` / `BURN_ROLE` to curve and forge.
-4. `MintBerylBitsTeamAllocation` — mint `25` team tokens, then revoke the temporary mint role.
-5. `curve.setTeamSellLock(TEAM_ADDRESS, 1000)` — enable the team sell lock.
+2. Deploy UUPS curve / forge / NFT implementations + proxies (`DeployBerylBitsUpgradeableSystem`, which also grants NFT `FORGE_ROLE` to forge and calls `initializeV2`).
+3. `GrantBerylBitsB20Roles` — grant B20 `MINT_ROLE` / `BURN_ROLE` to curve and forge (run with `base-forge --skip-simulation`, it touches the B20 precompile).
+4. `MintBerylBitsTeamAllocation` — mint `25` team tokens, then revoke the temporary mint role (use `--slow` to avoid nonce races on the grant/mint/revoke trio).
+5. `curve.setTeamSellLock(TEAM_ADDRESS, 1000)` — enable the team sell lock. Optionally `curve.setMaxBuyUnitsPerWallet(25)` for a fair-launch cap **before** any public buys (see note below).
 6. `ConfigureBerylBitsB20Metadata` — set issuer metadata (contract addresses, team allocation, team sell lock).
 7. Smoke: `buy → forge → redeemAndSell`.
+
+> **Buy-cap note:** `curveBoughtUnits` is only written while a cap is active (`maxBuyUnitsPerWallet > 0`). If the cap is enabled *after* public buys have happened, those earlier buys are not counted and those wallets get a fresh full quota. Set the cap before opening public buys, or leave it at `0`.
 
 The `UpgradeBerylBits*` scripts handle in-place implementation upgrades for the existing proxies.
 
@@ -125,6 +127,7 @@ The `UpgradeBerylBits*` scripts handle in-place implementation upgrades for the 
 ## Security
 
 - Pashov-style AI review resolved: live-supply NFT cap, admin-gated `initializeV2`, non-upgradeable forge reentrancy guard, and removal of `forgeWithPermit` (permit-nonce griefing).
+- Latest review pass (12 specialty agents): added a `__gap` storage reserve to `BerylBitsUpgradeableBase` so future base-contract state cannot collide with child storage. The team sell lock, treasury config, and trait entropy are tracked as documented v1 decisions/leads, not blockers.
 - Trait randomness uses block-derived entropy — accepted for v1 (rarity is collectible metadata, not financial utility; practical bias requires sequencer cooperation).
 - Admin/upgrade roles are deployer-held by current decision; Safe/timelock migration is the recommended later hardening.
 

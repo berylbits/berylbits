@@ -207,6 +207,13 @@ Pashov-style AI review was run against the Solidity scope. High-confidence findi
 Resolved after the latest review pass:
 
 - `forgeWithPermit` permit-nonce griefing vector is removed. The forge contracts now expose only the standard approve-and-forge path, so there is no permit nonce for an attacker to pre-consume.
+- `BerylBitsUpgradeableBase` now reserves a `uint256[48] __gap`. The base contract holds shared role/pause state inherited by curve, forge, and NFT; the gap lets it gain storage in a future upgrade without colliding with child-contract slots.
+
+Latest multi-agent pass (12 specialty agents) — confirmed and triaged:
+
+- The team sell lock is keyed on the ETH `payoutRecipient` and intentionally covers `sell`, `sellTo`, and `redeemAndSell`. It is a credible-commitment guard against the team wallet, not airtight against a malicious admin (who could route through another wallet); this is an accepted v1 stance.
+- Treasury is fixed at `initialize` with no setter. A treasury that reverts on receive would brick buys until an upgrade. Accepted while treasury is the deployer EOA; a `setTreasury` is the recommended hardening if treasury ever becomes a contract.
+- Buy-cap accounting gap (see Fair-Launch Buy Cap below): pre-cap buys are invisible once a cap is later enabled. Mitigated operationally by setting the cap before public buys.
 
 Remaining leads to track before or after launch:
 
@@ -233,6 +240,7 @@ The curve supports an optional per-wallet buy cap to slow one-transaction sweeps
 - `curveBoughtUnits[wallet]` tracks cumulative curve-bought units per wallet; `_buy` reverts `WalletBuyCapExceeded` past the cap.
 - Applies only to curve buys (forge/redeem/team off-curve mint are unaffected).
 - It is a soft, sybil-imperfect speed bump (a whale can split across wallets), best paired with frontend friction if stricter fairness is needed. Typically set tight at launch (e.g. `25`) and lifted once initial demand settles.
+- **Tracking gap:** `curveBoughtUnits` is only written when a cap is active (`maxBuyUnitsPerWallet > 0`). Buys made while the cap is `0` are never recorded, so enabling a cap afterward grants those wallets a fresh full quota. Set the cap before opening public buys. Verified live on Sepolia (`2026-06-28`): after cap-less buys `curveBoughtUnits` read `0`; once a cap was set, subsequent buys tracked and `WalletBuyCapExceeded` fired at the limit.
 
 ## Public Communication Constraints
 
@@ -257,6 +265,11 @@ Frontend responsibilities:
 - Preview onchain SVG from `imageSVG(tokenId)`.
 - Keep private keys out of frontend env files.
 
+Trade-panel UX rules:
+
+- The Trade panel is intentionally minimal: it shows the input, the slippage-protected output quote, and price-protection controls. The fee/spread details (8% buy fee, 92% sell payout, round-trip cost) live only in the `Docs` tab, not repeated on every trade — the buy/sell surface stays clean.
+- Trade size is bounded per wallet. A buy is capped at the wallet's remaining curve allowance (`maxBuyUnitsPerWallet - curveBoughtUnits`, falling back to `25` when no on-chain cap is set); a sell is capped at the wallet's token balance. Exceeding the limit shows an inline alert and disables the buy/sell button, so a user cannot submit a transaction the contract would reject.
+
 Current frontend env:
 
 - `VITE_RAINBOW_PROJECT_ID=3c7c133910c85aa281f3dc73f2ce2848`
@@ -270,9 +283,9 @@ Current frontend env:
 2. Set B20 `contractURI` and initial issuer metadata.
 3. Deploy UUPS implementations.
 4. Deploy ERC1967 proxies with initializer calldata.
-5. Grant NFT `FORGE_ROLE` to forge proxy.
-6. Grant native B20 `MINT_ROLE` and `BURN_ROLE` to curve and forge proxies.
-7. Run `MintBerylBitsTeamAllocation.s.sol` to mint `25` Beryl Bits tokens for `TEAM_ADDRESS`.
+5. Grant NFT `FORGE_ROLE` to forge proxy (done inside `DeployBerylBitsUpgradeableSystem.s.sol`).
+6. Run `GrantBerylBitsB20Roles.s.sol` to grant native B20 `MINT_ROLE` and `BURN_ROLE` to curve and forge proxies (requires `base-forge --skip-simulation`).
+7. Run `MintBerylBitsTeamAllocation.s.sol` to mint `25` Beryl Bits tokens for `TEAM_ADDRESS` (use `--slow`; the script does grant→mint→revoke and is sensitive to nonce races).
 8. Call `curve.setTeamSellLock(TEAM_ADDRESS, unlockUnits)` to enable the team sell lock.
 9. Verify the temporary team mint role is revoked.
 10. Assign deployer wallet admin/upgrade/pause/rescue roles for current mainnet decision.
