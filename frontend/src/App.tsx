@@ -407,14 +407,13 @@ export function App() {
                 <small>raw quote: {eth(activeTradeQuote)} eth · price protection {protectionPercent}%</small>
               </div>
               <div className="quote-strip" aria-label="trade fee summary">
-                <Readout label="buy fee" value="8% to treasury" />
                 <Readout label="sell payout" value="92% of band" />
                 <Readout label="forge/redeem" value="0 fee" />
               </div>
               {tradeSide === 'buy' && tradeUnits > 0n ? (
                 <div className="fee-breakdown" aria-label="buy cost breakdown">
                   <Readout label="you pay (quote)" value={`${eth(quoteBuy)} eth`} />
-                  <Readout label="8% treasury fee" value={`${eth(buyTreasuryFee)} eth`} />
+                  <Readout label="treasury fee" value={`${eth(buyTreasuryFee)} eth`} />
                   <Readout label="if you sell now" value={`${eth(immediateSellValue)} eth`} />
                   <Readout
                     label="round-trip spread"
