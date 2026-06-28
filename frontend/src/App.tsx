@@ -13,6 +13,7 @@ import { explorer, contracts } from './config';
 import { curveAbi, erc20Abi, forgeAbi, nftAbi } from './abis';
 
 const unit = parseEther('1');
+const MAX_TRADE_UNITS = 25n;
 const modes = ['buy', 'forge', 'redeem', 'activity', 'docs', 'system'] as const;
 type Mode = (typeof modes)[number];
 type TradeSide = 'buy' | 'sell';
@@ -169,12 +170,6 @@ export function App() {
   const sellAmount = tradeUnits * unit;
   const needsCurveApproval = sellAmount > 0n && (effectiveCurveAllowance ?? 0n) < sellAmount;
   const activeTradeQuote = tradeSide === 'buy' ? quoteBuy : quoteSell;
-  const buyTreasuryFee = quoteBuy === undefined ? undefined : (quoteBuy * BigInt(800)) / 10_000n;
-  const immediateSellValue = quoteSell;
-  const roundTripLoss =
-    quoteBuy === undefined || quoteSell === undefined || quoteBuy <= quoteSell
-      ? undefined
-      : ((quoteBuy - quoteSell) * 10_000n) / quoteBuy;
   const busyButtonText = confirming ? 'waiting for confirmation' : 'confirm in wallet';
   const tradeButtonText = busy
     ? busyButtonText
@@ -188,6 +183,15 @@ export function App() {
   const currentBandIndex = bandIndexForUnits(currentOutstanding);
   const projectedBandIndex = bandIndexForUnits(projectedOutstanding);
   const crossesBand = tradeUnits > 0n && projectedBandIndex !== currentBandIndex;
+  // buy is limited by the wallet's remaining cap (cap - already bought), falling back to a flat 25
+  // when no on-chain cap is set; sell is limited by the wallet's actual token balance.
+  const walletBuyRemaining =
+    maxBuyPerWallet !== undefined && maxBuyPerWallet > 0n
+      ? (maxBuyPerWallet > (curveBought ?? 0n) ? maxBuyPerWallet - (curveBought ?? 0n) : 0n)
+      : MAX_TRADE_UNITS;
+  const sellMaxUnits = isConnected ? (b20Balance ?? 0n) / unit : MAX_TRADE_UNITS;
+  const tradeMaxUnits = tradeSide === 'buy' ? walletBuyRemaining : sellMaxUnits;
+  const overTradeLimit = tradeUnits > tradeMaxUnits;
   const protectionPercent = protectionValue.toLocaleString(undefined, { maximumFractionDigits: 2 });
 
   useEffect(() => {
@@ -406,21 +410,6 @@ export function App() {
                 <strong>{tradeOutput}</strong>
                 <small>raw quote: {eth(activeTradeQuote)} eth · price protection {protectionPercent}%</small>
               </div>
-              <div className="quote-strip" aria-label="trade fee summary">
-                <Readout label="sell payout" value="92% of band" />
-                <Readout label="forge/redeem" value="0 fee" />
-              </div>
-              {tradeSide === 'buy' && tradeUnits > 0n ? (
-                <div className="fee-breakdown" aria-label="buy cost breakdown">
-                  <Readout label="you pay (quote)" value={`${eth(quoteBuy)} eth`} />
-                  <Readout label="treasury fee" value={`${eth(buyTreasuryFee)} eth`} />
-                  <Readout label="if you sell now" value={`${eth(immediateSellValue)} eth`} />
-                  <Readout
-                    label="round-trip spread"
-                    value={roundTripLoss === undefined ? '...' : `~${(Number(roundTripLoss) / 100).toFixed(1)}% + gas`}
-                  />
-                </div>
-              ) : null}
               {tradeSide === 'buy' && tradeUnits > 0n ? (
                 <p className="fee-note">
                   An immediate buy then sell returns less than you paid. You profit only if net curve demand later moves the price into a higher band.
@@ -433,6 +422,17 @@ export function App() {
                     isConnected ? ` · ${(maxBuyPerWallet - (curveBought ?? 0n)).toString()} left` : ''
                   }`}
                 />
+              ) : null}
+              {overTradeLimit ? (
+                <div className="notice" role="alert">
+                  {tradeSide === 'buy'
+                    ? `you can buy at most ${tradeMaxUnits.toString()} more token${tradeMaxUnits === 1n ? '' : 's'}${
+                        maxBuyPerWallet !== undefined && maxBuyPerWallet > 0n
+                          ? ` (${(curveBought ?? 0n).toString()}/${maxBuyPerWallet.toString()} used)`
+                          : ''
+                      }.`
+                    : `you only hold ${tradeMaxUnits.toString()} token${tradeMaxUnits === 1n ? '' : 's'} to sell.`}
+                </div>
               ) : null}
               {crossesBand ? (
                 <div className="notice" role="status">
@@ -452,8 +452,8 @@ export function App() {
                   ))}
                 </div>
               </div>
-              <button className="button primary full" disabled={busy || tradeUnits === 0n || activeTradeQuote === undefined} onClick={trade}>
-                {tradeButtonText}
+              <button className="button primary full" disabled={busy || tradeUnits === 0n || overTradeLimit || activeTradeQuote === undefined} onClick={trade}>
+                {overTradeLimit ? (tradeSide === 'buy' ? 'over buy limit' : 'over balance') : tradeButtonText}
               </button>
               <CurveGraph outstanding={outstanding} publicCap={publicCap} quoteBuy={quoteBuy} quoteSell={quoteSell} tradeUnits={tradeUnits} tradeSide={tradeSide} />
             </div>
