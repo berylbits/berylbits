@@ -10,7 +10,7 @@ Base Mainnet chain id: **`8453`**.
 
 ### 0.1 B20 activation check
 
-B20 must be activated on Base mainnet before the factory will create an asset (mainnet activation: **2026-06-26 18:00 UTC**, Activation Registry may need ~1h).
+B20 must be activated on Base mainnet before the factory will create an asset. **As of 2026-06-28 this is still `false` on mainnet** — the factory precompile (`0xB20f…`) has no code yet. Do not attempt step 2 until this returns `true`. (Sepolia returns `true` today, so the check itself is correct.)
 
 ```bash
 # Activation Registry precompile: 0x8453000000000000000000000000000000000001
@@ -117,12 +117,16 @@ Record `NFT_PROXY_ADDRESS`, `FORGE_PROXY_ADDRESS`, `CURVE_PROXY_ADDRESS`.
 
 ## 4. Roles, team mint, team sell lock, metadata
 
-1. Grant NFT `FORGE_ROLE` to forge; grant B20 `MINT_ROLE`/`BURN_ROLE` to curve and forge.
+1. NFT `FORGE_ROLE` → forge is already granted inside step 3 (`DeployBerylBitsUpgradeableSystem`). Then grant B20 `MINT_ROLE`/`BURN_ROLE` to curve and forge with the `GrantBerylBitsB20Roles` script (below). Required before any buy/sell or forge/redeem.
 2. `MintBerylBitsTeamAllocation` — mint `25` team tokens, revoke temporary mint role.
 3. `curve.setTeamSellLock(TEAM_ADDRESS, 1000)`. Optionally `curve.setMaxBuyUnitsPerWallet(25)` for a fair-launch cap (lift later with `0`).
 4. `ConfigureBerylBitsB20Metadata` — issuer metadata (contracts, team wallet, allocation, team_sell_lock).
 
 ```bash
+# grant B20 mint+burn to curve and forge
+forge script script/GrantBerylBitsB20Roles.s.sol:GrantBerylBitsB20Roles \
+  --rpc-url "$BASE_MAINNET_RPC_URL" --broadcast --private-key "$DEPLOYER_PRIVATE_KEY"
+
 # team sell lock (after team mint)
 cast send --rpc-url "$BASE_MAINNET_RPC_URL" --private-key "$DEPLOYER_PRIVATE_KEY" \
   "$CURVE_PROXY_ADDRESS" 'setTeamSellLock(address,uint256)' "$TEAM_ADDRESS" 1000
